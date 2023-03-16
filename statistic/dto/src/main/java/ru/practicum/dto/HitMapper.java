@@ -14,11 +14,10 @@ public class HitMapper {
 
     public static HitDto toHitDto(EndpointHit endpointHit) {
         return new HitDto(
-                endpointHit.getId(),
+
                 endpointHit.getApp(),
                 endpointHit.getUri(),
-                endpointHit.getIp(),
-                endpointHit.getTimestamp()
+                null
         );
     }
 }

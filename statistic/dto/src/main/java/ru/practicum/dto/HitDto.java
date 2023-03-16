@@ -12,10 +12,9 @@ import java.time.LocalDateTime;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 
 public class HitDto {
-    Long id;
+
     String app;
     String uri;
-    String ip;
-    String timestamp;
+    Integer hits;
 
 }

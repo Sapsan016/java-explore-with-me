@@ -24,7 +24,7 @@ public class StatServiceImpl implements StatService {
     public EndpointHit addHit(HitAddDto hitAddDto) {
         EndpointHit hit = HitMapper.toHit(hitAddDto);
         statRepository.save(hit);
-        log.info("Добавлена информация о запросе с Id = {} создан", hit.getId());
+        log.info("Добавлена информация о запросе с Id = {}", hit.getId());
         return hit;
     }
 }

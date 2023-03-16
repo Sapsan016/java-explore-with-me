@@ -20,11 +20,10 @@ public class EndpointHit {
     @Column(name = "hit_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
 
-
     Long id;
     String app;
     String uri;
     String ip;
-    LocalDateTime timestamp;
+    String timestamp;
 
 }

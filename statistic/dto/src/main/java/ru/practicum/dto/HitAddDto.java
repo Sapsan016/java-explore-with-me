@@ -14,5 +14,5 @@ public class HitAddDto {
     String app;
     String uri;
     String ip;
-    LocalDateTime timestamp;
+    String timestamp;
 }

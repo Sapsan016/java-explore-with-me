@@ -47,13 +47,11 @@ public class StatServiceImpl implements StatService {
         return addHitCount(list);
     }
 
-
     private HitDto addHitCount(List<EndpointHit> list) {
         int hits = list.size();
-        if(list.isEmpty()) {
+        if (list.isEmpty()) {
             throw new HitsNotFoundException("Сведения отсуствуют");
         }
-
         HitDto dto = HitMapper.toHitDto(list.get(0));
         dto.setHits(hits);
         return dto;

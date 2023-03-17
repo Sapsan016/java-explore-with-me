@@ -8,7 +8,6 @@ import ru.practicum.dto.HitDto;
 import ru.practicum.dto.HitMapper;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -35,23 +34,17 @@ public class StatController {
                                  @RequestParam(required = false) String[] uris,
                                  @RequestParam(defaultValue = "false") boolean unique) {
         List<HitDto> list = new ArrayList<>();
-        if (unique) {
+        if (unique) {                                                        //Получение статистики для уникального ip
             for (String uri : uris) {
                 list.add(statService.getUniqueIpStats(start, end, uri));
             }
-
-        }
-        else {
-
+        } else {
             for (String uri : uris) {
                 list.add(statService.getUriStats(start, end, uri));
             }
         }
-
         return list.stream()
                 .sorted(Comparator.comparingInt(HitDto::getHits).reversed())
                 .collect(Collectors.toList());
     }
-
-
 }

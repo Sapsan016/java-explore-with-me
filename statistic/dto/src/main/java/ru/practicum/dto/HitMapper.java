@@ -14,7 +14,6 @@ public class HitMapper {
 
     public static HitDto toHitDto(EndpointHit endpointHit) {
         return new HitDto(
-
                 endpointHit.getApp(),
                 endpointHit.getUri(),
                 null

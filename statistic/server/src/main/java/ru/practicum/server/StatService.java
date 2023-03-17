@@ -10,7 +10,8 @@ import java.util.List;
 public interface StatService {
     EndpointHit addHit(HitAddDto hitAddDto);
 
-    List<EndpointHit> getStats(String start, String end);
-
     HitDto getUriStats(String start, String end, String uri);
+
+    // HitDto getUniqueIpStats(String start, String end, String uri);
+    HitDto getUniqueIpStats(String start, String end, String uri);
 }

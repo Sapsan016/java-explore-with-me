@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import ru.practicum.dto.HitAddDto;
 import ru.practicum.dto.HitDto;
 import ru.practicum.dto.HitMapper;
+import ru.practicum.exception.HitsNotFoundException;
 import ru.practicum.model.EndpointHit;
 
 import java.util.List;
@@ -31,22 +32,30 @@ public class StatServiceImpl implements StatService {
         return hit;
     }
 
-    @Override
-    public List<EndpointHit> getStats(String start, String end) {
-        log.info("Запрошена статистика за период с {} по {} для всех событий", start, end);
-        return statRepository.findAllByTimestampBetween(start,end);
-    }
 
     @Override
     public HitDto getUriStats(String start, String end, String uri) {
         log.info("Запрошена статистика за период с {} по {} для uri = {}", start, end, uri);
         List<EndpointHit> list = statRepository.findAllByTimestampBetweenAndUri(start, end, uri);
-        int hits = list.size();
-        HitDto dto = HitMapper.toHitDto(list.get(0));
-        dto.setHits(hits);
-
-        return dto;
-
+        return addHitCount(list);
     }
 
+    @Override
+    public HitDto getUniqueIpStats(String start, String end, String uri) {
+        log.info("Запрошена статистика за период с {} по {} для uri = {} c уникальными IP", start, end, uri);
+        List<EndpointHit> list = statRepository.findUniqueUriStats(uri, start, end);
+        return addHitCount(list);
+    }
+
+
+    private HitDto addHitCount(List<EndpointHit> list) {
+        int hits = list.size();
+        if(list.isEmpty()) {
+            throw new HitsNotFoundException("Сведения отсуствуют");
+        }
+
+        HitDto dto = HitMapper.toHitDto(list.get(0));
+        dto.setHits(hits);
+        return dto;
+    }
 }

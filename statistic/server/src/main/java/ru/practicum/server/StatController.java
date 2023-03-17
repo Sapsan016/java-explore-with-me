@@ -32,23 +32,26 @@ public class StatController {
     @GetMapping(path = "/stats")                                                  //Получение статистики за период
     public List<HitDto> getStats(@RequestParam String start,
                                  @RequestParam String end,
-                                 @RequestParam(required = false) String[] uris) {
-
-
-        if(uris.length != 0) {
-            List<HitDto> list = new ArrayList<>();
-            for(String uri : uris) {
-                list.add(statService.getUriStats(start, end, uri));
+                                 @RequestParam(required = false) String[] uris,
+                                 @RequestParam(defaultValue = "false") boolean unique) {
+        List<HitDto> list = new ArrayList<>();
+        if (unique) {
+            for (String uri : uris) {
+                list.add(statService.getUniqueIpStats(start, end, uri));
             }
 
-            return list.stream()
-                    .sorted(Comparator.comparingInt(HitDto::getHits).reversed())
-                    .collect(Collectors.toList());
+        }
+        else {
+
+            for (String uri : uris) {
+                list.add(statService.getUriStats(start, end, uri));
+            }
         }
 
-        return statService.getStats(start, end).stream()
-                .map(HitMapper::toHitDto)
+        return list.stream()
+                .sorted(Comparator.comparingInt(HitDto::getHits).reversed())
                 .collect(Collectors.toList());
     }
+
 
 }

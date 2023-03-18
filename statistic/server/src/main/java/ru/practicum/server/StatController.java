@@ -7,6 +7,7 @@ import ru.practicum.dto.HitAddDto;
 import ru.practicum.dto.HitDto;
 import ru.practicum.dto.HitMapper;
 
+import javax.validation.Valid;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -27,7 +28,7 @@ public class StatController {
 
     @PostMapping(path = "/hit")                                        //Сохранение информации о запросе на эндпойнт
     @ResponseStatus(HttpStatus.CREATED)
-    public HitDto addEndpointHit(@RequestBody HitAddDto hitAddDto) {
+    public HitDto addEndpointHit(@RequestBody @Valid HitAddDto hitAddDto) {
         return HitMapper.toHitDto(statService.addHit(hitAddDto));
     }
 

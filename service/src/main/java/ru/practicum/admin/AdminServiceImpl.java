@@ -23,7 +23,7 @@ public class AdminServiceImpl implements AdminService {
     public Category createCategory(AddCatDto addCatDto) {
         Category category = CatMapper.toCat(addCatDto);
         adminRepository.save(category);
-        log.info("Добавлена информация о запросе с Id = {}", category.getId());
+        log.info("Добавлена категория с Id = {}", category.getId());
         return category;
     }
 }

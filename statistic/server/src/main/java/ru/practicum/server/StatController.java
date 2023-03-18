@@ -7,6 +7,8 @@ import ru.practicum.dto.HitAddDto;
 import ru.practicum.dto.HitDto;
 import ru.practicum.dto.HitMapper;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -16,6 +18,7 @@ import java.util.stream.Collectors;
 public class StatController {
 
     private final StatService statService;
+    public static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
     public StatController(StatService statService) {
         this.statService = statService;
@@ -36,11 +39,13 @@ public class StatController {
         List<HitDto> list = new ArrayList<>();
         if (unique) {                                                        //Получение статистики для уникального ip
             for (String uri : uris) {
-                list.add(statService.getUniqueIpStats(start, end, uri));
+                list.add(statService.getUniqueIpStats(LocalDateTime.parse(start, FORMATTER),
+                        LocalDateTime.parse(end, FORMATTER), uri));
             }
         } else {
             for (String uri : uris) {
-                list.add(statService.getUriStats(start, end, uri));
+                list.add(statService.getUriStats(LocalDateTime.parse(start, FORMATTER),
+                        LocalDateTime.parse(end, FORMATTER), uri));
             }
         }
         return list.stream()

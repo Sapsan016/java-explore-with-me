@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 
 @Data
 @NoArgsConstructor
@@ -23,6 +24,6 @@ public class EndpointHit {
     String app;
     String uri;
     String ip;
-    String timestamp;
+    LocalDateTime timestamp;
 
 }

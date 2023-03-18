@@ -10,6 +10,7 @@ import ru.practicum.dto.HitMapper;
 import ru.practicum.exception.HitsNotFoundException;
 import ru.practicum.model.EndpointHit;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -34,14 +35,14 @@ public class StatServiceImpl implements StatService {
 
 
     @Override
-    public HitDto getUriStats(String start, String end, String uri) {
+    public HitDto getUriStats(LocalDateTime start, LocalDateTime end, String uri) {
         log.info("Запрошена статистика за период с {} по {} для uri = {}", start, end, uri);
         List<EndpointHit> list = statRepository.findAllByTimestampBetweenAndUri(start, end, uri);
         return addHitCount(list);
     }
 
     @Override
-    public HitDto getUniqueIpStats(String start, String end, String uri) {
+    public HitDto getUniqueIpStats(LocalDateTime start, LocalDateTime end, String uri) {
         log.info("Запрошена статистика за период с {} по {} для uri = {} c уникальными IP", start, end, uri);
         List<EndpointHit> list = statRepository.findUniqueUriStats(uri, start, end);
         return addHitCount(list);

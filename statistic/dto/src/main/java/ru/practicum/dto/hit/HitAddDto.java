@@ -1,4 +1,4 @@
-package ru.practicum.dto;
+package ru.practicum.dto.hit;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AccessLevel;

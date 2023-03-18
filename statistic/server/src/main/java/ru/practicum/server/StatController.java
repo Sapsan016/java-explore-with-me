@@ -3,9 +3,9 @@ package ru.practicum.server;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.dto.HitAddDto;
-import ru.practicum.dto.HitDto;
-import ru.practicum.dto.HitMapper;
+import ru.practicum.dto.hit.HitAddDto;
+import ru.practicum.dto.hit.HitDto;
+import ru.practicum.dto.hit.HitMapper;
 
 import javax.validation.Valid;
 import java.time.LocalDateTime;

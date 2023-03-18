@@ -1,4 +1,6 @@
-package ru.practicum.dto;
+package ru.practicum.dto.hit;
+import ru.practicum.dto.hit.HitAddDto;
+import ru.practicum.dto.hit.HitDto;
 import ru.practicum.model.EndpointHit;
 
 public class HitMapper {

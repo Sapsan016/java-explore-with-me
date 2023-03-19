@@ -5,6 +5,8 @@ import ru.practicum.dto.users.AddUserDto;
 import ru.practicum.model.Category;
 import ru.practicum.model.User;
 
+import java.util.List;
+
 public interface AdminService {
     Category createCategory(AddCatDto category);
 
@@ -15,4 +17,6 @@ public interface AdminService {
     User addUser(AddUserDto addUserDto);
 
     void removeUser(Long userId);
+
+    List<User> getUsers(Long[] ids, Integer from, Integer size);
 }

@@ -14,6 +14,10 @@ import ru.practicum.model.User;
 import ru.practicum.repositories.CategoryRepository;
 import ru.practicum.repositories.UserRepository;
 
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Service
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @Slf4j
@@ -55,9 +59,10 @@ public class AdminServiceImpl implements AdminService {
     public User addUser(AddUserDto addUserDto) {
         User user = UserMapper.toUser(addUserDto);
         userRepository.save(user);
-        log.info("Добавлена категория с Id = {}", user.getId());
+        log.info("Добавлен пользователь с Id = {}", user.getId());
         return user;
     }
+
 
     @Override
     public void removeUser(Long userId) {
@@ -66,11 +71,24 @@ public class AdminServiceImpl implements AdminService {
         log.info("Удален пользователь с Id = {}", userId);
     }
 
+    @Override
+    public List<User> getUsers(Long[] ids, Integer from, Integer size) {
+        if (ids.length == 0) {
+            log.info("Выполняется поиск всех пользователей пропуская первых {}, размер списка {}", from, size);
+        return userRepository.getAllUsers(from, size);
+        }
+       return Arrays.stream(ids).map(this::findUserById)
+               .skip(from)
+               .limit(size)
+               .collect(Collectors.toList());
+    }
+
 
     private Category findCategoryById(Long catId) {
         return categoryRepository.findById(catId).orElseThrow(() ->
                 new ObjectNotFoundException(String.format("Category with id=%s was not found", catId)));
     }
+
     private User findUserById(Long userId) {
         return userRepository.findById(userId).orElseThrow(() ->
                 new ObjectNotFoundException(String.format("User with id=%s was not found", userId)));

@@ -11,6 +11,9 @@ import ru.practicum.dto.users.UserDto;
 import ru.practicum.dto.users.UserMapper;
 
 import javax.validation.Valid;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/admin")
@@ -49,6 +52,22 @@ public class AdminController {
         log.info("AdminController: Получен запрос на добавление пользователя {}", addUserDto.toString());
         return UserMapper.toUserDto(adminService.addUser(addUserDto));
     }
+
+    @GetMapping("/users")
+    public List<UserDto> getStats(@RequestParam(required = false, defaultValue = "") Long[] ids,
+                                  @RequestParam(defaultValue = "0") Integer from,
+                                  @RequestParam(defaultValue = "10") Integer size) {
+        log.info("AdminController: Получен запрос на поиск пользователей с номерами Id {}, " +
+                "пропуская первых {}, размер списка = {}", Arrays.toString(ids), from, size);
+
+        return adminService.getUsers(ids, from, size)
+                .stream()
+                .map(UserMapper::toUserDto)
+                .collect(Collectors.toList());
+    }
+
+
+
 
     @DeleteMapping("/users/{userId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)

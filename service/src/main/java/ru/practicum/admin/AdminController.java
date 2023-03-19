@@ -66,14 +66,10 @@ public class AdminController {
                 .collect(Collectors.toList());
     }
 
-
-
-
     @DeleteMapping("/users/{userId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void removeUser(@PathVariable Long userId) {
         log.info("AdminController: Получен запрос на удаление пользователя ID = {}", userId);
         adminService.removeUser(userId);
     }
-
 }

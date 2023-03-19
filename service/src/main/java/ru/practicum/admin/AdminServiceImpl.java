@@ -75,12 +75,14 @@ public class AdminServiceImpl implements AdminService {
     public List<User> getUsers(Long[] ids, Integer from, Integer size) {
         if (ids.length == 0) {
             log.info("Выполняется поиск всех пользователей пропуская первых {}, размер списка {}", from, size);
-        return userRepository.getAllUsers(from, size);
+            return userRepository.getAllUsers(from, size);
         }
-       return Arrays.stream(ids).map(this::findUserById)
-               .skip(from)
-               .limit(size)
-               .collect(Collectors.toList());
+        log.info("Выполняется поиск всех пользователей с id {} пропуская первых {}, размер списка {}",
+                Arrays.toString(ids), from, size);
+        return Arrays.stream(ids).map(this::findUserById)
+                .skip(from)
+                .limit(size)
+                .collect(Collectors.toList());
     }
 
 

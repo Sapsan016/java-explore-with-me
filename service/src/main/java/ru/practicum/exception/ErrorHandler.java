@@ -6,6 +6,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -26,6 +27,14 @@ public class ErrorHandler {
         return new ErrorResponse(e.getMessage(),
                 "BAD_REQUEST", "Incorrectly made request.", LocalDateTime.now().format(FORMATTER));
     }
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponse badArgumentRequest(final MethodArgumentTypeMismatchException e) {
+        return new ErrorResponse(e.getMessage(),
+                "BAD_REQUEST", "Incorrectly made request.", LocalDateTime.now().format(FORMATTER));
+    }
+
+
     @ExceptionHandler
     @ResponseStatus(HttpStatus.CONFLICT)
     public ErrorResponse dataViolationException(final DataIntegrityViolationException e) {

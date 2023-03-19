@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.practicum.dto.category.AddCatDto;
 import ru.practicum.dto.category.CatMapper;
+import ru.practicum.exception.CategoryNotFoundException;
 import ru.practicum.model.Category;
 
 @Service
@@ -25,5 +26,18 @@ public class AdminServiceImpl implements AdminService {
         adminRepository.save(category);
         log.info("Добавлена категория с Id = {}", category.getId());
         return category;
+    }
+
+    @Override
+    public void removeCategory(Long itemId) {
+        Category catToRemove = findCategoryById(itemId);
+        adminRepository.delete(catToRemove);
+        log.info("Удалена категория с Id = {}", itemId);
+
+    }
+
+    private Category findCategoryById(Long catId) {
+        return adminRepository.findById(catId).orElseThrow(() ->
+                new CategoryNotFoundException(String.format("Category with id=%s was not found", catId)));
     }
 }

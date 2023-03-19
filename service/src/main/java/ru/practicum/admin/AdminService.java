@@ -5,4 +5,6 @@ import ru.practicum.model.Category;
 
 public interface AdminService {
     Category createCategory(AddCatDto category);
+
+    void removeCategory(Long itemId);
 }

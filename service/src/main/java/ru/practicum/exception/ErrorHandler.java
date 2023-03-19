@@ -15,10 +15,11 @@ public class ErrorHandler {
     public static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
     @ExceptionHandler
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ErrorResponse categoryNotFoundExceptionResponse(final CategoryNotFoundException e) {
+    public ErrorResponse objectNotFoundExceptionResponse(final ObjectNotFoundException e) {
         return new ErrorResponse(e.getMessage(),
                 "NOT_FOUND", "The required object was not found.", LocalDateTime.now().format(FORMATTER));
     }
+
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse badRequest(final MethodArgumentNotValidException e) {

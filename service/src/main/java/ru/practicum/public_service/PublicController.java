@@ -1,10 +1,7 @@
 package ru.practicum.public_service;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import ru.practicum.dto.category.CatDto;
 import ru.practicum.dto.category.CatMapper;
 import ru.practicum.dto.users.UserDto;
@@ -34,5 +31,11 @@ public class PublicController {
                 .stream()
                 .map(CatMapper::toCatDto)
                 .collect(Collectors.toList());
+    }
+
+    @GetMapping("/categories/{catId}")
+    CatDto getCategoryById(@PathVariable Long catId) {
+        log.info("PublicController: Получен запрос на поиск категории с Id = {}", catId);
+        return CatMapper.toCatDto(publicService.getCategoryById(catId));
     }
 }

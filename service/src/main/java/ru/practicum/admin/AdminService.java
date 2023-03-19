@@ -19,4 +19,6 @@ public interface AdminService {
     void removeUser(Long userId);
 
     List<User> getUsers(Long[] ids, Integer from, Integer size);
+
+    Category findCategoryById(Long catId);
 }

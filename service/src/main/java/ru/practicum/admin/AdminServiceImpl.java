@@ -85,13 +85,13 @@ public class AdminServiceImpl implements AdminService {
                 .collect(Collectors.toList());
     }
 
-
-    private Category findCategoryById(Long catId) {
+    @Override
+    public Category findCategoryById(Long catId) {
         return categoryRepository.findById(catId).orElseThrow(() ->
                 new ObjectNotFoundException(String.format("Category with id=%s was not found", catId)));
     }
 
-    private User findUserById(Long userId) {
+    public User findUserById(Long userId) {
         return userRepository.findById(userId).orElseThrow(() ->
                 new ObjectNotFoundException(String.format("User with id=%s was not found", userId)));
     }

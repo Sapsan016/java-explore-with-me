@@ -7,4 +7,6 @@ public interface AdminService {
     Category createCategory(AddCatDto category);
 
     void removeCategory(Long itemId);
+
+    Category alterCategory(Long catId, AddCatDto category);
 }

@@ -33,4 +33,9 @@ public class AdminController {
         log.info("AdminController: Получен запрос на удаление категории ID = {}", catId);
         adminService.removeCategory(catId);
     }
+    @PatchMapping("/categories/{catId}")
+    public CatDto alterCategory(@PathVariable Long catId, @RequestBody @Valid AddCatDto category) {
+        log.info("AdminController: Получен запрос на изменение категории ID = {}", catId);
+        return CatMapper.toCatDto(adminService.alterCategory(catId, category));
+    }
 }

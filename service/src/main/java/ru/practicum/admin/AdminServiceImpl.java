@@ -29,12 +29,21 @@ public class AdminServiceImpl implements AdminService {
     }
 
     @Override
-    public void removeCategory(Long itemId) {
-        Category catToRemove = findCategoryById(itemId);
+    public void removeCategory(Long catId) {
+        Category catToRemove = findCategoryById(catId);
         adminRepository.delete(catToRemove);
-        log.info("Удалена категория с Id = {}", itemId);
-
+        log.info("Удалена категория с Id = {}", catId);
     }
+
+    @Override
+    public Category alterCategory(Long catId, AddCatDto category) {
+        Category catToAlter = findCategoryById(catId);
+        catToAlter.setName(category.getName());
+        adminRepository.save(catToAlter);
+        log.info("Изменена категория с Id = {}", catToAlter.getId());
+        return catToAlter;
+    }
+
 
     private Category findCategoryById(Long catId) {
         return adminRepository.findById(catId).orElseThrow(() ->

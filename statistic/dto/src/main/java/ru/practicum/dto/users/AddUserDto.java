@@ -1,4 +1,4 @@
-package ru.practicum.dto.event;
+package ru.practicum.dto.users;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -13,7 +13,7 @@ import javax.validation.constraints.NotBlank;
 @AllArgsConstructor
 @NoArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class AddEventDto {
+public class AddUserDto {
     @NotBlank(message = "Field: name. Error: must not be blank. Value: null")
     String name;
     @NotBlank(message = "Field: email. Error: must not be blank. Value: null")

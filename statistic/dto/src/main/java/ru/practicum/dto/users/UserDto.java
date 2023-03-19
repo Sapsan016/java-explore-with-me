@@ -1,4 +1,4 @@
-package ru.practicum.dto.event;
+package ru.practicum.dto.users;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -8,7 +8,7 @@ import lombok.experimental.FieldDefaults;
 @Data
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class EventDto {
+public class UserDto {
     String email;
     Long id;
     String name;

@@ -11,10 +11,10 @@ import javax.persistence.*;
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Entity
-@Table(name = "events")
-public class Event {
+@Table(name = "users")
+public class User {
     @Id
-    @Column(name = "event_id")
+    @Column(name = "user_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
     String name;

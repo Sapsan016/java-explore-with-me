@@ -34,7 +34,6 @@ public class EventFullDto {
 
     Boolean paid;
 
-
     Integer participantLimit;
 
     String publishedOn;

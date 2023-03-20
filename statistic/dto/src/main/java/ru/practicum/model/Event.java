@@ -21,8 +21,9 @@ public class Event {
 
     String annotation;
 
-    @Column(name = "category_id")
-    Long categoryId;
+    @JoinColumn(name = "category_id")
+    @ManyToOne
+    Category category;
 
     @Column(name = "confirmed_requests")
     Integer confirmedRequests;
@@ -35,8 +36,9 @@ public class Event {
     @Column(name = "event_date")
     LocalDateTime eventDate;
 
-    @Column(name = "initiator_id")
-    Long userId;
+    @JoinColumn(name = "initiator_id")
+    @ManyToOne
+    User user;
 
     @JoinColumn(name = "location_id")
     @ManyToOne

@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/public")
+@RequestMapping
 @Slf4j
 public class PublicController {
     private final PublicService publicService;

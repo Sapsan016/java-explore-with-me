@@ -15,7 +15,6 @@ import ru.practicum.repositories.EventRepository;
 import ru.practicum.repositories.LocationRepository;
 import ru.practicum.repositories.UserRepository;
 
-import java.time.LocalDateTime;
 
 @Service
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
@@ -44,7 +43,7 @@ public class PrivateServiceImpl implements PrivateService {
         Event eventToAdd = EventMapper.toEvent(newEventDto);
         eventToAdd.setCategory(category);
         eventToAdd.setUser(initiator);
-        eventToAdd.setPublishedOn(LocalDateTime.now());
+    //    eventToAdd.setPublishedOn(LocalDateTime.now());
         locationRepository.save(eventToAdd.getLocation());
         log.info("Добавлена локация с Id = {}", eventToAdd.getLocation().getId());
         eventRepository.save(eventToAdd);

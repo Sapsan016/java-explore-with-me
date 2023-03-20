@@ -9,6 +9,8 @@ import ru.practicum.dto.users.UserShortDto;
 import ru.practicum.model.EventState;
 import ru.practicum.model.Location;
 
+import java.time.LocalDateTime;
+
 @Data
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
@@ -36,11 +38,11 @@ public class EventFullDto {
 
     Integer participantLimit;
 
-    String publishedOn;
+    LocalDateTime publishedOn;
 
     Boolean requestModeration;
 
-    EventState eventState;
+    EventState state;
 
     String title;
 

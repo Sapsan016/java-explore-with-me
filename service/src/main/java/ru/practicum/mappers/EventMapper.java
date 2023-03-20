@@ -52,7 +52,7 @@ public class EventMapper {
                 event.getLocation(),
                 event.getPaid(),
                 event.getParticipantLimit(),
-                event.getPublishedOn().format(FORMATTER),
+                event.getPublishedOn(),
                 event.getRequestModeration(),
                 event.getState(),
                 event.getTitle(),

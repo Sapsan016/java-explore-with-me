@@ -14,6 +14,7 @@ import ru.practicum.model.User;
 import ru.practicum.repositories.CategoryRepository;
 import ru.practicum.repositories.UserRepository;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -79,10 +80,15 @@ public class AdminServiceImpl implements AdminService {
         }
         log.info("Выполняется поиск всех пользователей с id {} пропуская первых {}, размер списка {}",
                 Arrays.toString(ids), from, size);
-        return Arrays.stream(ids).map(this::findUserById)
-                .skip(from)
-                .limit(size)
-                .collect(Collectors.toList());
+        try {
+            return Arrays.stream(ids).map(this::findUserById)
+                    .skip(from)
+                    .limit(size)
+                    .collect(Collectors.toList());
+        } catch (ObjectNotFoundException e) {
+            return new ArrayList<>();
+        }
+
     }
 
     @Override

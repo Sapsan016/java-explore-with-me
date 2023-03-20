@@ -10,7 +10,7 @@ import ru.practicum.mappers.EventMapper;
 import javax.validation.Valid;
 
 @RestController
-@RequestMapping("/private")
+@RequestMapping
 @Slf4j
 public class PrivateController {
 

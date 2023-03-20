@@ -88,7 +88,6 @@ public class AdminServiceImpl implements AdminService {
         } catch (ObjectNotFoundException e) {
             return new ArrayList<>();
         }
-
     }
 
     @Override

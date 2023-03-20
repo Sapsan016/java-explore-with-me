@@ -15,6 +15,8 @@ import ru.practicum.repositories.EventRepository;
 import ru.practicum.repositories.LocationRepository;
 import ru.practicum.repositories.UserRepository;
 
+import java.util.List;
+
 
 @Service
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
@@ -43,11 +45,17 @@ public class PrivateServiceImpl implements PrivateService {
         Event eventToAdd = EventMapper.toEvent(newEventDto);
         eventToAdd.setCategory(category);
         eventToAdd.setUser(initiator);
-    //    eventToAdd.setPublishedOn(LocalDateTime.now());
         locationRepository.save(eventToAdd.getLocation());
         log.info("Добавлена локация с Id = {}", eventToAdd.getLocation().getId());
         eventRepository.save(eventToAdd);
         log.info("Добавлено событие с Id = {}", eventToAdd.getId());
         return eventToAdd;
+    }
+
+    @Override
+    public List<Event> getEventsByUserId(Long userId, Integer from, Integer size) {
+        log.info("Выполняется поиск всех событий, добавленных пользователем с id = {} пропуская первых {}, размер списка {}",
+        userId, from, size);
+        return eventRepository.getAllEventsByUserId(userId, from, size);
     }
 }

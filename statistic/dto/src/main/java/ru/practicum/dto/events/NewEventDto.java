@@ -6,7 +6,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import org.aspectj.lang.annotation.After;
 import ru.practicum.model.Location;
 
 import javax.validation.constraints.*;
@@ -18,7 +17,6 @@ import java.time.LocalDateTime;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class NewEventDto {
 
-    static final LocalDateTime LOCAL_DATE_TIME = LocalDateTime.now();
 
     @NotBlank(message = "Field: annotation. Error: must not be blank. Value: null")
     @Size(min = 20, message = "Field: annotation. Error: must not be less than 20 characters.")
@@ -33,7 +31,7 @@ public class NewEventDto {
 
     @NotNull
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
-
+    @After(message = "Field: eventDate. Error: должно содержать дату, которая еще не наступила.")
     LocalDateTime eventDate;
 
     @NotNull

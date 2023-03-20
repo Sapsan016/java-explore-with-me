@@ -7,10 +7,8 @@ import ru.practicum.dto.events.EventFullDto;
 import ru.practicum.dto.events.EventShortDto;
 import ru.practicum.dto.events.NewEventDto;
 import ru.practicum.mappers.EventMapper;
-import ru.practicum.mappers.UserMapper;
 
 import javax.validation.Valid;
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -44,5 +42,13 @@ public class PrivateController {
                 .map(EventMapper::toEventShortDto)
                 .collect(Collectors.toList());
     }
+
+    @GetMapping("/{userId}/events/{eventId}")
+    public EventFullDto getFullEvent(@PathVariable Long userId, @PathVariable Long eventId) {
+        log.info("PublicController: Получен запрос на поиск полной информации о событии c Id = {} " +
+                "от пользователя Id = {}", eventId, userId);
+        return EventMapper.toEventFullDto(privateService.getFullEvent(userId, eventId));
+    }
+
 
 }

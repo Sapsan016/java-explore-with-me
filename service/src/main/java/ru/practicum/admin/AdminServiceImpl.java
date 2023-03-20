@@ -96,6 +96,7 @@ public class AdminServiceImpl implements AdminService {
                 new ObjectNotFoundException(String.format("Category with id=%s was not found", catId)));
     }
 
+    @Override
     public User findUserById(Long userId) {
         return userRepository.findById(userId).orElseThrow(() ->
                 new ObjectNotFoundException(String.format("User with id=%s was not found", userId)));

@@ -21,4 +21,6 @@ public interface AdminService {
     List<User> getUsers(Long[] ids, Integer from, Integer size);
 
     Category findCategoryById(Long catId);
+
+    User findUserById(Long userId);
 }

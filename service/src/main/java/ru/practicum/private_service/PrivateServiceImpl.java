@@ -4,6 +4,7 @@ import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import ru.practicum.admin.AdminService;
 import ru.practicum.dto.events.NewEventDto;
 import ru.practicum.exception.ObjectNotFoundException;
 import ru.practicum.mappers.EventMapper;
@@ -29,17 +30,22 @@ public class PrivateServiceImpl implements PrivateService {
     UserRepository userRepository;
     CategoryRepository categoryRepository;
 
-    public PrivateServiceImpl(EventRepository eventRepository, LocationRepository locationRepository, UserRepository userRepository, CategoryRepository categoryRepository) {
+    AdminService adminService;
+
+    public PrivateServiceImpl(EventRepository eventRepository, LocationRepository locationRepository,
+                              UserRepository userRepository, CategoryRepository categoryRepository,
+                              AdminService adminService) {
         this.eventRepository = eventRepository;
         this.locationRepository = locationRepository;
         this.userRepository = userRepository;
         this.categoryRepository = categoryRepository;
+        this.adminService = adminService;
     }
 
     @Override
     public Event addEvent(NewEventDto newEventDto, Long userId) {
         User initiator = userRepository.findById(userId).orElseThrow(() ->
-                new ObjectNotFoundException(String.format("Пользователь с id %s не найден",userId)));
+                new ObjectNotFoundException(String.format("Пользователь с id %s не найден", userId)));
         Category category = categoryRepository.findById(newEventDto.getCategory()).orElseThrow(() ->
                 new ObjectNotFoundException(String.format("Категория с id %s не найдена", newEventDto.getCategory())));
         Event eventToAdd = EventMapper.toEvent(newEventDto);
@@ -54,8 +60,17 @@ public class PrivateServiceImpl implements PrivateService {
 
     @Override
     public List<Event> getEventsByUserId(Long userId, Integer from, Integer size) {
-        log.info("Выполняется поиск всех событий, добавленных пользователем с id = {} пропуская первых {}, размер списка {}",
-        userId, from, size);
+        log.info("Выполняется поиск всех событий, добавленных пользователем с id = {} пропуская первых {}, " +
+                "размер списка {}", userId, from, size);
         return eventRepository.getAllEventsByUserId(userId, from, size);
+    }
+
+    @Override
+    public Event getFullEvent(Long userId, Long eventId) {
+        log.info("Выполняется поиск полной информации о событии с Id = {}, добавленныом пользователем с id = {}",
+                userId, eventId);
+        adminService.findUserById(userId);
+        return eventRepository.findById(eventId).orElseThrow(() ->
+                new ObjectNotFoundException(String.format("Event with id=%s was not found", eventId)));
     }
 }

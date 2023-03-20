@@ -5,16 +5,14 @@ import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.practicum.admin.AdminService;
+import ru.practicum.dto.events.EventActionState;
 import ru.practicum.dto.events.NewEventDto;
+import ru.practicum.dto.events.UpdateEventUserRequest;
 import ru.practicum.exception.ObjectNotFoundException;
 import ru.practicum.mappers.EventMapper;
-import ru.practicum.model.Category;
-import ru.practicum.model.Event;
-import ru.practicum.model.User;
-import ru.practicum.repositories.CategoryRepository;
+import ru.practicum.model.*;
 import ru.practicum.repositories.EventRepository;
 import ru.practicum.repositories.LocationRepository;
-import ru.practicum.repositories.UserRepository;
 
 import java.util.List;
 
@@ -26,28 +24,19 @@ public class PrivateServiceImpl implements PrivateService {
 
     EventRepository eventRepository;
     LocationRepository locationRepository;
-
-    UserRepository userRepository;
-    CategoryRepository categoryRepository;
-
     AdminService adminService;
 
     public PrivateServiceImpl(EventRepository eventRepository, LocationRepository locationRepository,
-                              UserRepository userRepository, CategoryRepository categoryRepository,
                               AdminService adminService) {
         this.eventRepository = eventRepository;
         this.locationRepository = locationRepository;
-        this.userRepository = userRepository;
-        this.categoryRepository = categoryRepository;
         this.adminService = adminService;
     }
 
     @Override
     public Event addEvent(NewEventDto newEventDto, Long userId) {
-        User initiator = userRepository.findById(userId).orElseThrow(() ->
-                new ObjectNotFoundException(String.format("Пользователь с id %s не найден", userId)));
-        Category category = categoryRepository.findById(newEventDto.getCategory()).orElseThrow(() ->
-                new ObjectNotFoundException(String.format("Категория с id %s не найдена", newEventDto.getCategory())));
+        User initiator = adminService.findUserById(userId);
+        Category category = adminService.findCategoryById(newEventDto.getCategory());
         Event eventToAdd = EventMapper.toEvent(newEventDto);
         eventToAdd.setCategory(category);
         eventToAdd.setUser(initiator);
@@ -73,4 +62,44 @@ public class PrivateServiceImpl implements PrivateService {
         return eventRepository.findById(eventId).orElseThrow(() ->
                 new ObjectNotFoundException(String.format("Event with id=%s was not found", eventId)));
     }
+
+    @Override
+    public Event updateEvent(UpdateEventUserRequest newEventDto, Long userId, Long eventId) {
+        Event eventToUpdate = findEventById(eventId);
+        if (eventToUpdate.getState().equals(EventState.PUBLISHED)) {
+            throw new IllegalArgumentException("Only pending or canceled events can be changed");
+        }
+        if (newEventDto.getAnnotation() != null)
+            eventToUpdate.setAnnotation(newEventDto.getAnnotation());
+        if (newEventDto.getCategory() != null)
+            eventToUpdate.setCategory(adminService.findCategoryById(newEventDto.getCategory()));
+        if (newEventDto.getDescription() != null)
+            eventToUpdate.setDescription(newEventDto.getDescription());
+        if (newEventDto.getLocation() != null) {
+            locationRepository.save(newEventDto.getLocation());
+            log.info("Добавлена локация с Id = {}", newEventDto.getLocation().getId());
+            eventToUpdate.setLocation(newEventDto.getLocation());
+        }
+        if (newEventDto.getPaid() != null)
+            eventToUpdate.setPaid(newEventDto.getPaid());
+        if (newEventDto.getParticipantLimit() != null)
+            eventToUpdate.setParticipantLimit(newEventDto.getParticipantLimit());
+        if (newEventDto.getRequestModeration() != null)
+            eventToUpdate.setRequestModeration(newEventDto.getRequestModeration());
+        if(newEventDto.getStateAction().equals(EventActionState.CANCEL_REVIEW))
+            eventToUpdate.setState(EventState.CANCELED);
+        if (newEventDto.getTitle() != null)
+            eventToUpdate.setTitle(newEventDto.getTitle());
+
+        eventRepository.save(eventToUpdate);
+        log.info("Обновлено событие с Id = {}", eventToUpdate.getId());
+        return eventToUpdate;
+    }
+
+    @Override
+    public Event findEventById(Long eventId) {
+        return eventRepository.findById(eventId).orElseThrow(() ->
+                new ObjectNotFoundException(String.format("Event with id=%s was not found", eventId)));
+    }
+
 }

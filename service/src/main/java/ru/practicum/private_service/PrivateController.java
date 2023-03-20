@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.*;
 import ru.practicum.dto.events.EventFullDto;
 import ru.practicum.dto.events.EventShortDto;
 import ru.practicum.dto.events.NewEventDto;
+import ru.practicum.dto.events.UpdateEventUserRequest;
 import ru.practicum.mappers.EventMapper;
 
 import javax.validation.Valid;
@@ -50,5 +51,11 @@ public class PrivateController {
         return EventMapper.toEventFullDto(privateService.getFullEvent(userId, eventId));
     }
 
-
+    @PatchMapping("/{userId}/events/{eventId}")
+    public EventFullDto updateEvent(@RequestBody @Valid UpdateEventUserRequest updateEventDto, @PathVariable Long userId,
+                                    @PathVariable Long eventId) {
+        log.info("PublicController: Получен запрос на обновления события Id = {} от пользователя Id = {}",
+                eventId, userId);
+        return EventMapper.toEventFullDto(privateService.updateEvent(updateEventDto, userId, eventId));
+    }
 }

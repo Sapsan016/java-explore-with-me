@@ -42,5 +42,12 @@ public class ErrorHandler {
                 "CONFLICT", "Integrity constraint has been violated.",
                 LocalDateTime.now().format(FORMATTER));
     }
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public ErrorResponse eventStateViolationException(final IllegalArgumentException e) {
+        return new ErrorResponse(e.getMessage(),
+                "BAD_REQUEST", "For the requested operation the conditions are not met.",
+                LocalDateTime.now().format(FORMATTER));
+    }
 
 }

@@ -5,10 +5,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.dto.category.AddCatDto;
 import ru.practicum.dto.category.CatDto;
-import ru.practicum.dto.category.CatMapper;
+import ru.practicum.mappers.CatMapper;
 import ru.practicum.dto.users.AddUserDto;
 import ru.practicum.dto.users.UserDto;
-import ru.practicum.dto.users.UserMapper;
+import ru.practicum.mappers.UserMapper;
 
 import javax.validation.Valid;
 import java.util.Arrays;

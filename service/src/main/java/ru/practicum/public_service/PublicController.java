@@ -3,11 +3,8 @@ package ru.practicum.public_service;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.dto.category.CatDto;
-import ru.practicum.dto.category.CatMapper;
-import ru.practicum.dto.users.UserDto;
-import ru.practicum.dto.users.UserMapper;
+import ru.practicum.mappers.CatMapper;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 

@@ -1,5 +1,7 @@
-package ru.practicum.dto.category;
+package ru.practicum.mappers;
 
+import ru.practicum.dto.category.AddCatDto;
+import ru.practicum.dto.category.CatDto;
 import ru.practicum.model.Category;
 
 public class CatMapper {

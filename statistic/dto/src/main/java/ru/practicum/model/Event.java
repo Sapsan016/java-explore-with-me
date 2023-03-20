@@ -27,7 +27,7 @@ public class Event {
     @Column(name = "confirmed_requests")
     Integer confirmedRequests;
 
-    @Column(name = "careated_on")
+    @Column(name = "created_on")
     LocalDateTime createdOn;
 
     String description;

@@ -2,16 +2,11 @@ package ru.practicum.mappers;
 
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
-import ru.practicum.dto.category.CatMapper;
 import ru.practicum.dto.events.EventFullDto;
 import ru.practicum.dto.events.EventShortDto;
 import ru.practicum.dto.events.NewEventDto;
-import ru.practicum.dto.users.UserDto;
-import ru.practicum.dto.users.UserMapper;
-import ru.practicum.dto.users.UserShortDto;
 import ru.practicum.model.Event;
 import ru.practicum.model.EventState;
-import ru.practicum.model.User;
 import ru.practicum.repositories.CategoryRepository;
 import ru.practicum.repositories.UserRepository;
 
@@ -28,16 +23,16 @@ public class EventMapper {
 
     static DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
-    public static Event toEvent(NewEventDto newEventDto) {
+    public static Event toEvent(NewEventDto newEventDto, Long userId) {
         return new Event(
                 null,
                 newEventDto.getAnnotation(),
-                newEventDto.getCategoryId(),
+                newEventDto.getCategory(),
                 null,
                 LocalDateTime.now(),
                 newEventDto.getDescription(),
                 newEventDto.getEventDate(),
-                null,
+                userId,
                 newEventDto.getLocation(),
                 newEventDto.getPaid(),
                 newEventDto.getParticipantLimit(),

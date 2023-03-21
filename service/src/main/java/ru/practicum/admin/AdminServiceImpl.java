@@ -5,20 +5,18 @@ import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.practicum.dto.category.AddCatDto;
+import ru.practicum.dto.compilations.NewCompilationDto;
+import ru.practicum.dto.events.EventShortDto;
 import ru.practicum.dto.events.requests.UpdateEventRequest;
 import ru.practicum.dto.events.states.EventActionStates;
 import ru.practicum.mappers.CatMapper;
 import ru.practicum.dto.users.AddUserDto;
+import ru.practicum.mappers.CompilationMapper;
+import ru.practicum.mappers.EventMapper;
 import ru.practicum.mappers.UserMapper;
 import ru.practicum.exception.ObjectNotFoundException;
-import ru.practicum.model.Category;
-import ru.practicum.model.Event;
-import ru.practicum.model.EventState;
-import ru.practicum.model.User;
-import ru.practicum.repositories.CategoryRepository;
-import ru.practicum.repositories.EventRepository;
-import ru.practicum.repositories.LocationRepository;
-import ru.practicum.repositories.UserRepository;
+import ru.practicum.model.*;
+import ru.practicum.repositories.*;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -38,12 +36,22 @@ public class AdminServiceImpl implements AdminService {
 
     LocationRepository locationRepository;
 
+    CompilationRepository compilationRepository;
+
+    CompEventDAO compEventDAO;
+
+
+
+
     public AdminServiceImpl(CategoryRepository categoryRepository, UserRepository userRepository,
-                            EventRepository eventRepository, LocationRepository locationRepository) {
+                            EventRepository eventRepository, LocationRepository locationRepository,
+                            CompilationRepository compilationRepository, CompEventDAO compEventDAO) {
         this.categoryRepository = categoryRepository;
         this.userRepository = userRepository;
         this.eventRepository = eventRepository;
         this.locationRepository = locationRepository;
+        this.compilationRepository = compilationRepository;
+        this.compEventDAO = compEventDAO;
     }
 
     @Override
@@ -177,6 +185,25 @@ public class AdminServiceImpl implements AdminService {
         if (newEventDto.getTitle() != null)
             eventToUpdate.setTitle(newEventDto.getTitle());
         return eventToUpdate;
+    }
+
+    @Override
+    public Compilation addCompilation(NewCompilationDto newCompilationDto) {
+        List<Long> events = newCompilationDto.getEvents();
+        Compilation compilation = CompilationMapper.toCompilation(newCompilationDto);
+        compilationRepository.save(compilation);
+        log.info("Добавлена подборка событий с Id = {}", compilation.getId());
+
+        if(!events.isEmpty()) {
+            events.forEach(e -> compEventDAO.addNewCompEventPair(
+                    compilation.getId(), e));
+            log.info("Добавлены события с Id = {} в подборку с Id = {}", events, compilation.getId());
+            List<EventShortDto> compilationEvents = events.stream()
+                    .map(e -> eventRepository.findById(e).get())
+                    .map(EventMapper::toEventShortDto).collect(Collectors.toList());
+            compilation.setEvents(compilationEvents);
+        }
+        return compilation;
     }
 
 }

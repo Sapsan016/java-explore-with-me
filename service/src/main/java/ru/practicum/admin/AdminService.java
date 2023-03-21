@@ -1,9 +1,11 @@
 package ru.practicum.admin;
 
 import ru.practicum.dto.category.AddCatDto;
+import ru.practicum.dto.compilations.NewCompilationDto;
 import ru.practicum.dto.events.requests.UpdateEventRequest;
 import ru.practicum.dto.users.AddUserDto;
 import ru.practicum.model.Category;
+import ru.practicum.model.Compilation;
 import ru.practicum.model.Event;
 import ru.practicum.model.User;
 
@@ -33,4 +35,6 @@ public interface AdminService {
     Event updateEvent(UpdateEventRequest updateEventDto, Long eventId);
 
     Event checkUpdateEvent(Event eventToUpdate, UpdateEventRequest newEventDto);
+
+    Compilation addCompilation(NewCompilationDto newCompilationDto);
 }

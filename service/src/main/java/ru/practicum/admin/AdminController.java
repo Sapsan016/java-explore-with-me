@@ -5,11 +5,14 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.dto.category.AddCatDto;
 import ru.practicum.dto.category.CatDto;
+import ru.practicum.dto.compilations.CompilationDto;
+import ru.practicum.dto.compilations.NewCompilationDto;
 import ru.practicum.dto.events.EventFullDto;
 import ru.practicum.dto.events.requests.UpdateEventRequest;
 import ru.practicum.mappers.CatMapper;
 import ru.practicum.dto.users.AddUserDto;
 import ru.practicum.dto.users.UserDto;
+import ru.practicum.mappers.CompilationMapper;
 import ru.practicum.mappers.EventMapper;
 import ru.practicum.mappers.UserMapper;
 
@@ -86,6 +89,15 @@ public class AdminController {
         log.info("AdminController: Получен запрос на обновления события Id = {}", eventId);
         return EventMapper.toEventFullDto(adminService.updateEvent(updateEventDto, eventId));
     }
+
+    @PostMapping("/compilations")
+    @ResponseStatus(HttpStatus.CREATED)
+    public CompilationDto addCompilation(@RequestBody NewCompilationDto newCompilationDto) {
+        log.info("AdminController: Получен запрос на создание подборки {}", newCompilationDto.toString());
+        return CompilationMapper.toDto(adminService.addCompilation(newCompilationDto));
+    }
+
+
 
 //To do
 //    @GetMapping("/events")

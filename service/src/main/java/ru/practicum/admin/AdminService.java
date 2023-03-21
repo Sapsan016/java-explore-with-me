@@ -37,4 +37,8 @@ public interface AdminService {
     Event checkUpdateEvent(Event eventToUpdate, UpdateEventRequest newEventDto);
 
     Compilation addCompilation(NewCompilationDto newCompilationDto);
+
+    void removeCompilation(Long compId);
+
+    Compilation alterCompilation(Long compId, NewCompilationDto newCompDto);
 }

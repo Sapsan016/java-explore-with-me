@@ -41,8 +41,6 @@ public class AdminServiceImpl implements AdminService {
     CompEventDAO compEventDAO;
 
 
-
-
     public AdminServiceImpl(CategoryRepository categoryRepository, UserRepository userRepository,
                             EventRepository eventRepository, LocationRepository locationRepository,
                             CompilationRepository compilationRepository, CompEventDAO compEventDAO) {
@@ -124,6 +122,11 @@ public class AdminServiceImpl implements AdminService {
                 new ObjectNotFoundException(String.format("User with id=%s was not found", userId)));
     }
 
+    public Compilation findCompilationById(Long compId) {
+        return compilationRepository.findById(compId).orElseThrow(() ->
+                new ObjectNotFoundException(String.format("Compilation with id=%s was not found", compId)));
+    }
+
 
     //To do
     @Override
@@ -193,17 +196,52 @@ public class AdminServiceImpl implements AdminService {
         Compilation compilation = CompilationMapper.toCompilation(newCompilationDto);
         compilationRepository.save(compilation);
         log.info("Добавлена подборка событий с Id = {}", compilation.getId());
-
-        if(!events.isEmpty()) {
-            events.forEach(e -> compEventDAO.addNewCompEventPair(
-                    compilation.getId(), e));
-            log.info("Добавлены события с Id = {} в подборку с Id = {}", events, compilation.getId());
-            List<EventShortDto> compilationEvents = events.stream()
-                    .map(e -> eventRepository.findById(e).get())
-                    .map(EventMapper::toEventShortDto).collect(Collectors.toList());
-            compilation.setEvents(compilationEvents);
+        if (events.size() > 0) {
+            return addEventsToCompilation(compilation, events);
         }
+        compilation.setEvents(new ArrayList<>());
         return compilation;
     }
+
+    @Override
+    public void removeCompilation(Long compId) {
+        Compilation compToRemove = findCompilationById(compId);
+        compilationRepository.delete(compToRemove);
+        log.info("Удалена категория с Id = {}", compId);
+    }
+
+    @Override
+    public Compilation alterCompilation(Long compId, NewCompilationDto newCompDto) {
+        Compilation compToAlter = findCompilationById(compId);
+
+        List<Long> events = newCompDto.getEvents();
+        if (newCompDto.getPinned() != null)
+            compToAlter.setPinned(newCompDto.getPinned());
+        if (newCompDto.getTitle() != null)
+            compToAlter.setTitle(newCompDto.getTitle());
+        compilationRepository.save(compToAlter);
+        log.info("Обновлена подборка событий с Id = {}", compToAlter.getId());
+        if (events != null) {
+            compEventDAO.removeCompEvents(compId);
+            return addEventsToCompilation(compToAlter, events);
+        }
+        List<Long> savedEvents = compEventDAO.getAllEventsId(compId);
+        compToAlter.setEvents(savedEvents.stream()
+                .map(e -> eventRepository.findById(e).get())
+                .map(EventMapper::toEventShortDto).collect(Collectors.toList()));
+        return compToAlter;
+    }
+
+    public Compilation addEventsToCompilation(Compilation compilation, List<Long> events) {
+        events.forEach(e -> compEventDAO.addNewCompEventPair(
+                compilation.getId(), e));
+        log.info("Добавлены события с Id = {} в подборку с Id = {}", events, compilation.getId());
+        List<EventShortDto> compilationEvents = events.stream()
+                .map(e -> eventRepository.findById(e).get())
+                .map(EventMapper::toEventShortDto).collect(Collectors.toList());
+        compilation.setEvents(compilationEvents);
+        return compilation;
+    }
+
 
 }

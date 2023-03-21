@@ -97,6 +97,24 @@ public class AdminController {
         return CompilationMapper.toDto(adminService.addCompilation(newCompilationDto));
     }
 
+    @DeleteMapping("/compilations/{compId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void removeCompilation(@PathVariable Long compId) {
+        log.info("AdminController: Получен запрос на удаление подборки ID = {}", compId);
+        adminService.removeCompilation(compId);
+    }
+
+    @PatchMapping("/compilations/{compId}")
+    public CompilationDto alterCompilation(@PathVariable Long compId,
+                                           @RequestBody @Valid NewCompilationDto newCompDto) {
+        log.info("AdminController: Получен запрос на изменение подборки ID = {}", compId);
+        return CompilationMapper.toDto(adminService.alterCompilation(compId, newCompDto));
+    }
+
+
+
+
+
 
 
 //To do

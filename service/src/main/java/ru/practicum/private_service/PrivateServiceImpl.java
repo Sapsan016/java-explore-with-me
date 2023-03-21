@@ -5,9 +5,9 @@ import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.practicum.admin.AdminService;
-import ru.practicum.dto.events.EventActionState;
+import ru.practicum.dto.events.requests.UpdateEventRequest;
+import ru.practicum.dto.events.states.EventActionStates;
 import ru.practicum.dto.events.NewEventDto;
-import ru.practicum.dto.events.UpdateEventUserRequest;
 import ru.practicum.exception.ObjectNotFoundException;
 import ru.practicum.mappers.EventMapper;
 import ru.practicum.model.*;
@@ -64,32 +64,13 @@ public class PrivateServiceImpl implements PrivateService {
     }
 
     @Override
-    public Event updateEvent(UpdateEventUserRequest newEventDto, Long userId, Long eventId) {
+    public Event updateEvent(UpdateEventRequest newEventDto, Long userId, Long eventId) {
         Event eventToUpdate = findEventById(eventId);
-        if (eventToUpdate.getState().equals(EventState.PUBLISHED)) {
-            throw new IllegalArgumentException("Only pending or canceled events can be changed");
-        }
-        if (newEventDto.getAnnotation() != null)
-            eventToUpdate.setAnnotation(newEventDto.getAnnotation());
-        if (newEventDto.getCategory() != null)
-            eventToUpdate.setCategory(adminService.findCategoryById(newEventDto.getCategory()));
-        if (newEventDto.getDescription() != null)
-            eventToUpdate.setDescription(newEventDto.getDescription());
-        if (newEventDto.getLocation() != null) {
-            locationRepository.save(newEventDto.getLocation());
-            log.info("Добавлена локация с Id = {}", newEventDto.getLocation().getId());
-            eventToUpdate.setLocation(newEventDto.getLocation());
-        }
-        if (newEventDto.getPaid() != null)
-            eventToUpdate.setPaid(newEventDto.getPaid());
-        if (newEventDto.getParticipantLimit() != null)
-            eventToUpdate.setParticipantLimit(newEventDto.getParticipantLimit());
-        if (newEventDto.getRequestModeration() != null)
-            eventToUpdate.setRequestModeration(newEventDto.getRequestModeration());
-        if(newEventDto.getStateAction().equals(EventActionState.CANCEL_REVIEW))
+
+        eventToUpdate = adminService.checkUpdateEvent(eventToUpdate, newEventDto);
+
+        if (newEventDto.getStateAction().equals(EventActionStates.CANCEL_REVIEW))
             eventToUpdate.setState(EventState.CANCELED);
-        if (newEventDto.getTitle() != null)
-            eventToUpdate.setTitle(newEventDto.getTitle());
 
         eventRepository.save(eventToUpdate);
         log.info("Обновлено событие с Id = {}", eventToUpdate.getId());

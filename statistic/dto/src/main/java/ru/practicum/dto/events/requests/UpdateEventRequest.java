@@ -1,4 +1,4 @@
-package ru.practicum.dto.events;
+package ru.practicum.dto.events.requests;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AccessLevel;
@@ -6,16 +6,18 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import ru.practicum.model.EventState;
+import ru.practicum.dto.events.states.EventActionStates;
+import ru.practicum.dto.events.validators.After;
 import ru.practicum.model.Location;
 
 import javax.validation.constraints.Size;
 import java.time.LocalDateTime;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class UpdateEventUserRequest {
+public class UpdateEventRequest {
 
     @Size(min = 20, message = "Field: annotation. Error: must not be less than 20 characters.")
     @Size(max = 2000, message = "Field: annotation. Error: must not be more than 2000 characters.")
@@ -39,7 +41,7 @@ public class UpdateEventUserRequest {
 
     Boolean requestModeration;
 
-    EventActionState stateAction;
+    EventActionStates stateAction;
 
     @Size(max = 120, message = "Field: annotation. Error: must not be more than 120 characters.")
     @Size(min = 3, message = "Field: annotation. Error: must not be less than 3 characters.")

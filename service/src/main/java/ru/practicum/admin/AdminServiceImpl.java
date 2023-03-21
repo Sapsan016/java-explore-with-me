@@ -5,15 +5,22 @@ import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.practicum.dto.category.AddCatDto;
+import ru.practicum.dto.events.requests.UpdateEventRequest;
+import ru.practicum.dto.events.states.EventActionStates;
 import ru.practicum.mappers.CatMapper;
 import ru.practicum.dto.users.AddUserDto;
 import ru.practicum.mappers.UserMapper;
 import ru.practicum.exception.ObjectNotFoundException;
 import ru.practicum.model.Category;
+import ru.practicum.model.Event;
+import ru.practicum.model.EventState;
 import ru.practicum.model.User;
 import ru.practicum.repositories.CategoryRepository;
+import ru.practicum.repositories.EventRepository;
+import ru.practicum.repositories.LocationRepository;
 import ru.practicum.repositories.UserRepository;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -27,9 +34,16 @@ public class AdminServiceImpl implements AdminService {
     CategoryRepository categoryRepository;
     UserRepository userRepository;
 
-    public AdminServiceImpl(CategoryRepository categoryRepository, UserRepository userRepository) {
+    EventRepository eventRepository;
+
+    LocationRepository locationRepository;
+
+    public AdminServiceImpl(CategoryRepository categoryRepository, UserRepository userRepository,
+                            EventRepository eventRepository, LocationRepository locationRepository) {
         this.categoryRepository = categoryRepository;
         this.userRepository = userRepository;
+        this.eventRepository = eventRepository;
+        this.locationRepository = locationRepository;
     }
 
     @Override
@@ -101,4 +115,68 @@ public class AdminServiceImpl implements AdminService {
         return userRepository.findById(userId).orElseThrow(() ->
                 new ObjectNotFoundException(String.format("User with id=%s was not found", userId)));
     }
+
+
+    //To do
+    @Override
+    public List<Event> getEvents(Long[] users, String[] states, Long[] categories, LocalDateTime rangeStart,
+                                 LocalDateTime rangeEnd, Integer from, Integer size) {
+//        List<User> userList = getUsers(users, 0, Integer.MAX_VALUE);
+//        EventState[] eventStates = (EventState[]) Arrays.stream(states).map(EventState::valueOf).toArray();
+
+        log.info("Выполняется поиск всех событий, добавленных пользователями с номерами Id {}," +
+                        "состояния событий: {}, категории событий: {}, события должны произойте не раньше чем: {}, " +
+                        "и не позже чем: {} пропуская первых {}, размер списка = {}.",
+                users, states, categories, rangeStart, rangeEnd, from, size);
+        return eventRepository.findEventsByUserIdAndStateAndEventDateBetween(
+                users, states, categories, rangeStart, rangeEnd, from, size);
+
+    }
+
+    @Override
+    public Event updateEvent(UpdateEventRequest updateEventDto, Long eventId) {
+        Event eventToUpdate = eventRepository.findById(eventId).orElseThrow(() ->
+                new ObjectNotFoundException(String.format("Event with id=%s was not found", eventId)));
+
+
+        if (eventToUpdate.getEventDate().isBefore(LocalDateTime.now().plusHours(1)))
+            throw new IllegalArgumentException("The event starts in less than 1 hour from now " +
+                    "and could not be changed");
+        eventToUpdate = checkUpdateEvent(eventToUpdate, updateEventDto);
+
+        if (updateEventDto.getStateAction().equals(EventActionStates.PUBLISH_EVENT))
+            eventToUpdate.setState(EventState.PUBLISHED);
+        if (updateEventDto.getStateAction().equals(EventActionStates.REJECT_EVENT))
+            eventToUpdate.setState(EventState.CANCELED);
+        eventRepository.save(eventToUpdate);
+        log.info("Обновлено событие с Id = {}", eventToUpdate.getId());
+        return eventToUpdate;
+    }
+
+    @Override
+    public Event checkUpdateEvent(Event eventToUpdate, UpdateEventRequest newEventDto) {
+        if (eventToUpdate.getState().equals(EventState.PUBLISHED))
+            throw new IllegalArgumentException("Only pending or canceled events can be changed");
+        if (newEventDto.getAnnotation() != null)
+            eventToUpdate.setAnnotation(newEventDto.getAnnotation());
+        if (newEventDto.getCategory() != null)
+            eventToUpdate.setCategory(findCategoryById(newEventDto.getCategory()));
+        if (newEventDto.getDescription() != null)
+            eventToUpdate.setDescription(newEventDto.getDescription());
+        if (newEventDto.getLocation() != null) {
+            locationRepository.save(newEventDto.getLocation());
+            log.info("Добавлена локация с Id = {}", newEventDto.getLocation().getId());
+            eventToUpdate.setLocation(newEventDto.getLocation());
+        }
+        if (newEventDto.getPaid() != null)
+            eventToUpdate.setPaid(newEventDto.getPaid());
+        if (newEventDto.getParticipantLimit() != null)
+            eventToUpdate.setParticipantLimit(newEventDto.getParticipantLimit());
+        if (newEventDto.getRequestModeration() != null)
+            eventToUpdate.setRequestModeration(newEventDto.getRequestModeration());
+        if (newEventDto.getTitle() != null)
+            eventToUpdate.setTitle(newEventDto.getTitle());
+        return eventToUpdate;
+    }
+
 }

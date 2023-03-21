@@ -1,10 +1,13 @@
 package ru.practicum.admin;
 
 import ru.practicum.dto.category.AddCatDto;
+import ru.practicum.dto.events.requests.UpdateEventRequest;
 import ru.practicum.dto.users.AddUserDto;
 import ru.practicum.model.Category;
+import ru.practicum.model.Event;
 import ru.practicum.model.User;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 public interface AdminService {
@@ -23,4 +26,11 @@ public interface AdminService {
     Category findCategoryById(Long catId);
 
     User findUserById(Long userId);
+
+    List<Event> getEvents(Long[] users, String[] states, Long[] categories, LocalDateTime rangeStart,
+                          LocalDateTime rangeEnd, Integer from, Integer size);
+
+    Event updateEvent(UpdateEventRequest updateEventDto, Long eventId);
+
+    Event checkUpdateEvent(Event eventToUpdate, UpdateEventRequest newEventDto);
 }

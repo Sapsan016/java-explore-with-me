@@ -12,4 +12,6 @@ public interface PublicService {
     Category getCategoryById(Long catId);
 
     List<Compilation> getCompilations(Boolean pinned, Integer from, Integer size);
+
+    Compilation getCompilationById(Long compId);
 }

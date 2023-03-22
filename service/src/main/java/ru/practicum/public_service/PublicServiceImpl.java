@@ -5,6 +5,8 @@ import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.practicum.admin.AdminService;
+import ru.practicum.dto.events.EventShortDto;
+import ru.practicum.exception.ObjectNotFoundException;
 import ru.practicum.mappers.EventMapper;
 import ru.practicum.model.Category;
 import ru.practicum.model.Compilation;
@@ -33,7 +35,8 @@ public class PublicServiceImpl implements PublicService {
     EventRepository eventRepository;
 
     public PublicServiceImpl(CategoryRepository categoryRepository, AdminService adminService,
-                             CompilationRepository compilationRepository, CompEventDAO compEventDAO, EventRepository eventRepository) {
+                             CompilationRepository compilationRepository, CompEventDAO compEventDAO,
+                             EventRepository eventRepository) {
         this.categoryRepository = categoryRepository;
         this.adminService = adminService;
         this.compilationRepository = compilationRepository;
@@ -60,6 +63,19 @@ public class PublicServiceImpl implements PublicService {
         }
         List<Compilation> allCompilations = compilationRepository.getAllCompilations(from, size);
         return addCompEvents(allCompilations);
+    }
+
+    @Override
+    public Compilation getCompilationById(Long compId) {
+        Compilation compilation = compilationRepository.findById(compId).orElseThrow(() ->
+                new ObjectNotFoundException(String.format("Compilation with id=%s was not found", compId)));
+        List<EventShortDto> compEvents = compEventDAO.getAllEventsId(compId)
+                .stream()
+                .map(id -> eventRepository.findById(id).get())
+                .map(EventMapper::toEventShortDto)
+                .collect(Collectors.toList());
+        compilation.setEvents(compEvents);
+        return compilation;
     }
 
     public List<Compilation> addCompEvents(List<Compilation> compilations) {

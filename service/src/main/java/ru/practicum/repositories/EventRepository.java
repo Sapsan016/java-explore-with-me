@@ -2,9 +2,7 @@ package ru.practicum.repositories;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-import ru.practicum.model.Category;
 import ru.practicum.model.Event;
-import ru.practicum.model.User;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -29,6 +27,20 @@ public interface EventRepository extends JpaRepository<Event, Long> {
 
     @Query(value = "SELECT * FROM events offset ? LIMIT ?", nativeQuery = true)
     List<Event> getEventsByFromAndSize(Integer from, Integer size);
+
+    @Query("select e from Event e " +
+            "where e.state='PUBLISHED' and (lower(e.annotation) like lower(concat('%', ?1, '%')) " +
+            " or lower(e.description) like lower(concat('%', ?1, '%'))) and e.eventDate>= ?2 and e.eventDate < ?3")
+    List<Event> searchWithStartEnd(String text, LocalDateTime startRange, LocalDateTime endRange);
+    @Query("select e from Event e " +
+            "where e.state='PUBLISHED' and (lower(e.annotation) like lower(concat('%', ?1, '%')) " +
+            " or lower(e.description) like lower(concat('%', ?1, '%'))) and e.eventDate>= ?2")
+    List<Event> searchEventsAfterStartRange(String text, LocalDateTime startRange);
+
+    @Query("select e from Event e " +
+            "where e.state='PUBLISHED' and (lower(e.annotation) like lower(concat('%', ?1, '%')) " +
+            " or lower(e.description) like lower(concat('%', ?1, '%'))) and e.eventDate< ?2")
+    List<Event> searchEventsBeforeEndRange(String text, LocalDateTime endRange);
 
 
 

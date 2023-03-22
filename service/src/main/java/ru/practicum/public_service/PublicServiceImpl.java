@@ -11,12 +11,11 @@ import ru.practicum.mappers.EventMapper;
 import ru.practicum.model.Category;
 import ru.practicum.model.Compilation;
 import ru.practicum.model.Event;
-import ru.practicum.repositories.CategoryRepository;
-import ru.practicum.repositories.CompEventDAO;
-import ru.practicum.repositories.CompilationRepository;
-import ru.practicum.repositories.EventRepository;
+import ru.practicum.repositories.*;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -34,14 +33,17 @@ public class PublicServiceImpl implements PublicService {
 
     EventRepository eventRepository;
 
+    RequestRepository requestRepository;
+
     public PublicServiceImpl(CategoryRepository categoryRepository, AdminService adminService,
                              CompilationRepository compilationRepository, CompEventDAO compEventDAO,
-                             EventRepository eventRepository) {
+                             EventRepository eventRepository, RequestRepository requestRepository) {
         this.categoryRepository = categoryRepository;
         this.adminService = adminService;
         this.compilationRepository = compilationRepository;
         this.compEventDAO = compEventDAO;
         this.eventRepository = eventRepository;
+        this.requestRepository = requestRepository;
     }
 
 
@@ -84,12 +86,71 @@ public class PublicServiceImpl implements PublicService {
         return compilation;
     }
 
+    @Override
+    public List<Event> searchEventsAfterStartRange(String text, Long[] categories, Boolean paid,
+                                                   LocalDateTime startRange, Boolean onlyAvailable,
+                                                   String sort, Integer from, Integer size) {
+        List<Event> foundEvents = eventRepository.searchEventsAfterStartRange(text.toLowerCase(), startRange);
+
+        return filterEvents(foundEvents, categories, paid,onlyAvailable,sort,from,size);
+    }
+
+    @Override
+    public List<Event> searchEventsBeforeEndRange(String text, Long[] categories, Boolean paid, LocalDateTime endRange,
+                                                  Boolean onlyAvailable, String sort, Integer from, Integer size) {
+        List<Event> foundEvents = eventRepository.searchEventsBeforeEndRange(text.toLowerCase(), endRange);
+
+        return filterEvents(foundEvents, categories, paid,onlyAvailable,sort,from,size);
+    }
+
+    @Override
+    public List<Event> searchEventsWithStartAndEndRange(String text, Long[] categories, Boolean paid,
+                                                        LocalDateTime startRange, LocalDateTime endRange,
+                                                        Boolean onlyAvailable, String sort, Integer from,
+                                                        Integer size) {
+        List<Event> foundEvents = eventRepository.searchWithStartEnd(text.toLowerCase(), startRange, endRange);
+
+        return filterEvents(foundEvents, categories, paid,onlyAvailable,sort,from,size);
+    }
+
+    private List<Event> filterEvents(List<Event> foundEvents, Long[] categories, Boolean paid, Boolean onlyAvailable,
+                                     String sort, Integer from, Integer size) {
+        if (categories.length != 0) {
+            for (Long category : categories) {
+                foundEvents = foundEvents.stream()
+                        .filter(event -> event.getCategory().equals(adminService.findCategoryById(category)))
+                        .collect(Collectors.toList());
+            }
+        }
+        if (onlyAvailable) {
+            foundEvents = foundEvents.stream()
+                    .filter(event -> event.getParticipantLimit() > requestRepository
+                            .countParticipationRequestsByEvent(event.getId()))
+                    .collect(Collectors.toList());
+        }
+        if (sort.equals("EVENT_DATE")) {
+            return foundEvents.stream()
+                    .filter(event -> event.getPaid().equals(paid))
+                    .sorted(Comparator.comparing(Event::getEventDate))
+                    .skip(from)
+                    .limit(size)
+                    .collect(Collectors.toList());
+        }
+        return foundEvents.stream()
+                .filter(event -> event.getPaid().equals(paid))
+                .sorted(Comparator.comparing(Event::getViews))
+                .skip(from)
+                .limit(size)
+                .collect(Collectors.toList());
+    }
+
+
     public List<Compilation> addCompEvents(List<Compilation> compilations) {
         log.info("Выполняется поиск и добавленние событий к категориям из списка: {}", compilations);
-        for(Compilation compilation : compilations) {
+        for (Compilation compilation : compilations) {
             List<Long> compEvIds = compEventDAO.getAllEventsId(compilation.getId());
             List<Event> compEvents = new ArrayList<>();
-            for(Long id : compEvIds) {
+            for (Long id : compEvIds) {
                 compEvents.add(eventRepository.findById(id).get());
             }
             compilation.setEvents(compEvents

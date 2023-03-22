@@ -111,6 +111,181 @@ public class AdminServiceImpl implements AdminService {
         }
     }
 
+    private void findEventsByUser(List <Event> foundEvents, Long [] users) {
+        for (Long user : users) {
+            foundEvents.addAll(eventRepository.getAllEventsByUserId(user, 0, Integer.MAX_VALUE));
+        }
+    }
+    private void findEventsByState(List <Event> foundEvents, String [] states) {
+        for (String state : states) {
+            foundEvents.addAll(eventRepository.findEventByState(state));
+        }
+    }
+
+    private void findEventsByCategoryAndFromSize(List <Event> foundEvents, Long [] categories, Integer from,
+                                                 Integer size) {
+        for (Long category : categories) {
+            foundEvents.addAll(eventRepository.getEventsByCategoryId(category, from, size));
+        }
+    }
+
+    @Override
+    public List<Event> getEventsWithTime(Long[] users, String[] states, Long[] categories, LocalDateTime rangeStart,
+                                         LocalDateTime rangeEnd, Integer from, Integer size) {
+        List<Event> foundEvents = new ArrayList<>();
+        if (users.length != 0) {
+            foundEvents = findEvents(users, states, categories, foundEvents);
+            return foundEvents.stream()
+                    .filter(event -> event.getEventDate().isAfter(rangeStart))
+                    .filter(event -> event.getEventDate().isBefore(rangeEnd))
+                    .skip(from)
+                    .limit(size)
+                    .collect(Collectors.toList());
+        }
+        if (states.length != 0) {
+            findEventsByState(foundEvents, states);
+            if (categories.length != 0) {
+                for (Long category : categories) {
+                    foundEvents = foundEvents.stream()
+                            .filter(event -> event.getCategory().getId().equals(category))
+                            .collect(Collectors.toList());
+                }
+            }
+            return foundEvents.stream()
+                    .filter(event -> event.getEventDate().isAfter(rangeStart))
+                    .filter(event -> event.getEventDate().isBefore(rangeEnd))
+                    .skip(from)
+                    .limit(size)
+                    .collect(Collectors.toList());
+        }
+        if (categories.length != 0) {
+            findEventsByCategoryAndFromSize(foundEvents, categories, from, size);
+            return foundEvents;
+        }
+        return eventRepository.getEventsByTimeAndFromAndSize(rangeStart, rangeEnd, from, size);
+    }
+
+    @Override
+    public List<Event> getEventsWithStartTimeParamTime(Long[] users, String[] states, Long[] categories,
+                                                       LocalDateTime rangeStart, Integer from, Integer size) {
+        List<Event> foundEvents = new ArrayList<>();
+        if (users.length != 0) {
+            foundEvents = findEvents(users, states, categories, foundEvents);
+            return foundEvents.stream()
+                    .filter(event -> event.getEventDate().isAfter(rangeStart))
+                    .skip(from)
+                    .limit(size)
+                    .collect(Collectors.toList());
+        }
+        if (states.length != 0) {
+            findEventsByState(foundEvents, states);
+            if (categories.length != 0) {
+                for (Long category : categories) {
+                    foundEvents = foundEvents.stream()
+                            .filter(event -> event.getCategory().getId().equals(category))
+                            .collect(Collectors.toList());
+                }
+            }
+            return foundEvents.stream()
+                    .filter(event -> event.getEventDate().isAfter(rangeStart))
+                    .skip(from)
+                    .limit(size)
+                    .collect(Collectors.toList());
+        }
+        if (categories.length != 0) {
+            findEventsByCategoryAndFromSize(foundEvents, categories, from, size);
+            return foundEvents;
+        }
+        return eventRepository.getEventsByStartTimeAndFromAndSize(rangeStart, from, size);
+    }
+
+    private List<Event> findEvents(Long[] users, String[] states, Long[] categories, List<Event> foundEvents) {
+        findEventsByUser(foundEvents, users);
+        if (states.length != 0) {
+            for (String state : states) {
+                foundEvents = foundEvents.stream()
+                        .filter(event -> event.getState().toString().equals(state))
+                        .collect(Collectors.toList());
+            }
+        }
+        if (categories.length != 0) {
+            for (Long category : categories) {
+                foundEvents = foundEvents.stream()
+                        .filter(event -> event.getCategory().getId().equals(category))
+                        .collect(Collectors.toList());
+            }
+        }
+        return foundEvents;
+    }
+
+
+    @Override
+    public List<Event> getEventsWithEndTimeParamTime(Long[] users, String[] states, Long[] categories,
+                                                     LocalDateTime rangeEnd, Integer from, Integer size) {
+        List<Event> foundEvents = new ArrayList<>();
+        if (users.length != 0) {
+            foundEvents = findEvents(users, states, categories, foundEvents);
+            return foundEvents.stream()
+                    .filter(event -> event.getEventDate().isBefore(rangeEnd))
+                    .skip(from)
+                    .limit(size)
+                    .collect(Collectors.toList());
+        }
+        if (states.length != 0) {
+            findEventsByState(foundEvents, states);
+            if (categories.length != 0) {
+                for (Long category : categories) {
+                    foundEvents = foundEvents.stream()
+                            .filter(event -> event.getCategory().getId().equals(category))
+                            .collect(Collectors.toList());
+                }
+            }
+            return foundEvents.stream()
+                    .filter(event -> event.getEventDate().isBefore(rangeEnd))
+                    .skip(from)
+                    .limit(size)
+                    .collect(Collectors.toList());
+        }
+        if (categories.length != 0) {
+            findEventsByCategoryAndFromSize(foundEvents, categories, from, size);
+            return foundEvents;
+        }
+        return eventRepository.getEventsByEndTimeAndFromAndSize(rangeEnd, from, size);
+    }
+
+
+    @Override
+    public List<Event> getEventsWithoutTime(Long[] users, String[] states, Long[] categories,
+                                            Integer from, Integer size) {
+        List<Event> foundEvents = new ArrayList<>();
+        if (users.length != 0) {
+            foundEvents = findEvents(users, states, categories, foundEvents);
+            return foundEvents.stream()
+                    .skip(from)
+                    .limit(size)
+                    .collect(Collectors.toList());
+        }
+        if (states.length != 0) {
+            findEventsByState(foundEvents, states);
+            if (categories.length != 0) {
+                for (Long category : categories) {
+                    foundEvents = foundEvents.stream()
+                            .filter(event -> event.getCategory().getId().equals(category))
+                            .collect(Collectors.toList());
+                }
+            }
+            return foundEvents.stream()
+                    .skip(from)
+                    .limit(size)
+                    .collect(Collectors.toList());
+        }
+        if (categories.length != 0) {
+            findEventsByCategoryAndFromSize(foundEvents, categories, from, size);
+            return foundEvents;
+        }
+        return eventRepository.getEventsByFromAndSize(from, size);
+    }
+
     @Override
     public Category findCategoryById(Long catId) {
         return categoryRepository.findById(catId).orElseThrow(() ->
@@ -128,22 +303,6 @@ public class AdminServiceImpl implements AdminService {
                 new ObjectNotFoundException(String.format("Compilation with id=%s was not found", compId)));
     }
 
-
-    //To do
-    @Override
-    public List<Event> getEvents(Long[] users, String[] states, Long[] categories, LocalDateTime rangeStart,
-                                 LocalDateTime rangeEnd, Integer from, Integer size) {
-//        List<User> userList = getUsers(users, 0, Integer.MAX_VALUE);
-//        EventState[] eventStates = (EventState[]) Arrays.stream(states).map(EventState::valueOf).toArray();
-
-        log.info("Выполняется поиск всех событий, добавленных пользователями с номерами Id {}," +
-                        "состояния событий: {}, категории событий: {}, события должны произойте не раньше чем: {}, " +
-                        "и не позже чем: {} пропуская первых {}, размер списка = {}.",
-                users, states, categories, rangeStart, rangeEnd, from, size);
-        return eventRepository.findEventsByUserIdAndStateAndEventDateBetween(
-                users, states, categories, rangeStart, rangeEnd, from, size);
-
-    }
 
     @Override
     public Event updateEvent(UpdateEventRequest updateEventDto, Long eventId) {
@@ -222,7 +381,7 @@ public class AdminServiceImpl implements AdminService {
             compToAlter.setTitle(newCompDto.getTitle());
         compilationRepository.save(compToAlter);
         log.info("Обновлена подборка событий с Id = {}", compToAlter.getId());
-        if (events.size() > 0 ) {
+        if (events.size() > 0) {
             compEventDAO.removeCompEvents(compId);
             return addEventsToCompilation(compToAlter, events);
         }
@@ -232,6 +391,7 @@ public class AdminServiceImpl implements AdminService {
                 .map(EventMapper::toEventShortDto).collect(Collectors.toList()));
         return compToAlter;
     }
+
 
     public Compilation addEventsToCompilation(Compilation compilation, List<Long> events) {
         events.forEach(e -> compEventDAO.addNewCompEventPair(

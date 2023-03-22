@@ -17,6 +17,7 @@ import ru.practicum.mappers.EventMapper;
 import ru.practicum.mappers.UserMapper;
 
 import javax.validation.Valid;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.List;
@@ -27,7 +28,7 @@ import java.util.stream.Collectors;
 @Slf4j
 public class AdminController {
 
-   public static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+    public static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
     private final AdminService adminService;
 
@@ -111,32 +112,44 @@ public class AdminController {
     }
 
 
+    @GetMapping("/events")
+    public List<EventFullDto> getEvents(@RequestParam(defaultValue = "") Long[] users,
+                                        @RequestParam(defaultValue = "") String[] states,
+                                        @RequestParam(defaultValue = "") Long[] categories,
+                                        @RequestParam(required = false) String rangeStart,
+                                        @RequestParam(required = false) String rangeEnd,
+                                        @RequestParam(defaultValue = "0") Integer from,
+                                        @RequestParam(defaultValue = "10") Integer size) {
+        log.info("AdminController: Получен запрос на поиск событий, добавленных пользователями с номерами Id {}, " +
+                        "состояния событий: {}, категории событий: {}, события должны произойте не раньше чем: {}, " +
+                        " и не позже чем: {} пропуская первых {}, размер списка = {}",
+                Arrays.toString(users), Arrays.toString(states), Arrays.toString(categories), rangeStart, rangeEnd,
+                from, size);
+        if (rangeStart == null && rangeEnd == null) {
+            return adminService.getEventsWithoutTime(users, states, categories, from, size).stream()
+                    .map(EventMapper::toEventFullDto)
+                    .collect(Collectors.toList());
+        }
 
+        if (rangeStart == null) {
+            return adminService.getEventsWithEndTimeParamTime(users, states, categories,
+                            LocalDateTime.parse(rangeEnd, FORMATTER), from, size).stream()
+                    .map(EventMapper::toEventFullDto)
+                    .collect(Collectors.toList());
+        }
+        if (rangeEnd == null) {
+            return adminService.getEventsWithStartTimeParamTime(users, states, categories,
+                            LocalDateTime.parse(rangeStart, FORMATTER), from, size).stream()
+                    .map(EventMapper::toEventFullDto)
+                    .collect(Collectors.toList());
+        }
 
-
-
-
-//To do
-//    @GetMapping("/events")
-//    public List<EventFullDto> getEvents(@RequestParam(required = false, defaultValue = "") Long[] users,
-//                                        @RequestParam(required = false, defaultValue = "") String[] states,
-//                                        @RequestParam(required = false, defaultValue = "") Long[] categories,
-//                                        @RequestParam(required = false) String rangeStart,
-//                                        @RequestParam(required = false) String rangeEnd,
-//                                        @RequestParam(defaultValue = "0") Integer from,
-//                                        @RequestParam(defaultValue = "10") Integer size) {
-//        log.info("AdminController: Получен запрос на поиск событий, добавленных пользователями с номерами Id {}, " +
-//                        "состояния событий: {}, категории событий: {}, события должны произойте не раньше чем: {}, " +
-//                        " и не позже чем: {} пропуская первых {}, размер списка = {}",
-//                Arrays.toString(users), Arrays.toString(states), Arrays.toString(categories), rangeStart, rangeEnd,
-//                from, size);
-//
-////        return adminService.getEvents(users, states, categories, LocalDateTime.parse(rangeStart, FORMATTER),
-////                        LocalDateTime.parse(rangeEnd, FORMATTER), from, size)
-////                .stream()
-////                .map(EventMapper::toEventFullDto)
-////                .collect(Collectors.toList());
-// //   }
+        return adminService.getEventsWithTime(users, states, categories, LocalDateTime.parse(rangeStart, FORMATTER),
+                        LocalDateTime.parse(rangeEnd, FORMATTER), from, size)
+                .stream()
+                .map(EventMapper::toEventFullDto)
+                .collect(Collectors.toList());
+    }
 
 
 }

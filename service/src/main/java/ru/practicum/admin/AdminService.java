@@ -29,8 +29,8 @@ public interface AdminService {
 
     User findUserById(Long userId);
 
-    List<Event> getEvents(Long[] users, String[] states, Long[] categories, LocalDateTime rangeStart,
-                          LocalDateTime rangeEnd, Integer from, Integer size);
+    List<Event> getEventsWithTime(Long[] users, String[] states, Long[] categories, LocalDateTime rangeStart,
+                                  LocalDateTime rangeEnd, Integer from, Integer size);
 
     Event updateEvent(UpdateEventRequest updateEventDto, Long eventId);
 
@@ -41,4 +41,13 @@ public interface AdminService {
     void removeCompilation(Long compId);
 
     Compilation alterCompilation(Long compId, NewCompilationDto newCompDto);
+
+
+    List<Event> getEventsWithoutTime(Long[] users, String[] states, Long[] categories, Integer from, Integer size);
+
+    List<Event> getEventsWithStartTimeParamTime(Long[] users, String[] states, Long[] categories,
+                                                LocalDateTime rangeStart, Integer from, Integer size);
+
+    List<Event> getEventsWithEndTimeParamTime(Long[] users, String[] states, Long[] categories, LocalDateTime rangeEnd,
+                                              Integer from, Integer size);
 }

@@ -8,12 +8,16 @@ import ru.practicum.admin.AdminService;
 import ru.practicum.dto.events.requests.UpdateEventRequest;
 import ru.practicum.dto.events.states.EventActionStates;
 import ru.practicum.dto.events.NewEventDto;
+import ru.practicum.dto.events.states.EventState;
+import ru.practicum.dto.events.states.RequestState;
 import ru.practicum.exception.ObjectNotFoundException;
 import ru.practicum.mappers.EventMapper;
 import ru.practicum.model.*;
 import ru.practicum.repositories.EventRepository;
 import ru.practicum.repositories.LocationRepository;
+import ru.practicum.repositories.RequestRepository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 
@@ -26,11 +30,14 @@ public class PrivateServiceImpl implements PrivateService {
     LocationRepository locationRepository;
     AdminService adminService;
 
+    RequestRepository requestRepository;
+
     public PrivateServiceImpl(EventRepository eventRepository, LocationRepository locationRepository,
-                              AdminService adminService) {
+                              AdminService adminService, RequestRepository requestRepository) {
         this.eventRepository = eventRepository;
         this.locationRepository = locationRepository;
         this.adminService = adminService;
+        this.requestRepository = requestRepository;
     }
 
     @Override
@@ -81,6 +88,34 @@ public class PrivateServiceImpl implements PrivateService {
     public Event findEventById(Long eventId) {
         return eventRepository.findById(eventId).orElseThrow(() ->
                 new ObjectNotFoundException(String.format("Event with id=%s was not found", eventId)));
+    }
+
+    @Override
+    public ParticipationRequest addRequest(Long userId, Long eventId) {
+        Event requestedEvent = findEventById(eventId);
+        log.info("Выполняются проверки запроса от пользователя Id = {} на участие в событии Id = {}", userId, eventId);
+        if (requestedEvent.getUser().getId().equals(userId))
+            throw new IllegalArgumentException("The requester can't participate in his own event.");
+        if (requestedEvent.getState().equals(EventState.PENDING))
+            throw new IllegalArgumentException("The event is not published.");
+        if (requestedEvent.getParticipantLimit() != 0) {
+            Integer requestCount = requestRepository.countParticipationRequestsByEvent(eventId);
+            if (requestCount.equals(requestedEvent.getParticipantLimit()))
+                throw new IllegalArgumentException("The event's participation limit has reached.");
+        }
+        ParticipationRequest requestToAdd = new ParticipationRequest(null, LocalDateTime.now(),eventId,
+                userId,null);
+        if (!requestedEvent.getRequestModeration()) {
+            requestToAdd.setStatus(RequestState.CONFIRMED);
+            requestRepository.save(requestToAdd);
+            log.info("Добавлен запрос с Id = {} на участие в событии с Id = {}", requestToAdd.getId(), eventId);
+            return requestToAdd;
+        }
+        requestToAdd.setStatus(RequestState.PENDING);
+        requestRepository.save(requestToAdd);
+        log.info("Добавлен запрос с Id = {} на участие в событии с Id = {}", requestToAdd.getId(), eventId);
+        return requestToAdd;
+
     }
 
 }

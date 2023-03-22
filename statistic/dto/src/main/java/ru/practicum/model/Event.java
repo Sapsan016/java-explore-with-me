@@ -2,6 +2,7 @@ package ru.practicum.model;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import ru.practicum.dto.events.states.EventState;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;

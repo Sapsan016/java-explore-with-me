@@ -9,6 +9,7 @@ import ru.practicum.dto.compilations.NewCompilationDto;
 import ru.practicum.dto.events.EventShortDto;
 import ru.practicum.dto.events.requests.UpdateEventRequest;
 import ru.practicum.dto.events.states.EventActionStates;
+import ru.practicum.dto.events.states.EventState;
 import ru.practicum.mappers.CatMapper;
 import ru.practicum.dto.users.AddUserDto;
 import ru.practicum.mappers.CompilationMapper;

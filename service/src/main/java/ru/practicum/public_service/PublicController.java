@@ -33,13 +33,13 @@ public class PublicController {
     }
 
     @GetMapping("/categories/{catId}")
-    CatDto getCategoryById(@PathVariable Long catId) {
+    public CatDto getCategoryById(@PathVariable Long catId) {
         log.info("PublicController: Получен запрос на поиск категории с Id = {}", catId);
         return CatMapper.toCatDto(publicService.getCategoryById(catId));
     }
 
     @GetMapping("/compilations")
-    List<CompilationDto> getCompilations(@RequestParam(defaultValue = "false") Boolean pinned,
+    public List<CompilationDto> getCompilations(@RequestParam(defaultValue = "false") Boolean pinned,
                                                 @RequestParam(defaultValue = "0") Integer from,
                                                 @RequestParam(defaultValue = "10") Integer size) {
         log.info("PublicController: Получен запрос на поиск подборок событий, закрепленных {}, " +
@@ -52,7 +52,7 @@ public class PublicController {
     }
 
     @GetMapping("/compilations/{compId}")
-    CompilationDto getCompilationById(@PathVariable Long compId) {
+    public CompilationDto getCompilationById(@PathVariable Long compId) {
         log.info("PublicController: Получен запрос на поиск подборки событий с Id = {}", compId);
         return CompilationMapper.toDto(publicService.getCompilationById(compId));
 

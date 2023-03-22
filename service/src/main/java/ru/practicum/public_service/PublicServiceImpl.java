@@ -47,26 +47,32 @@ public class PublicServiceImpl implements PublicService {
 
     @Override
     public List<Category> getCategories(Integer from, Integer size) {
+        log.info("Выполняется поиск всех категорий событий пропуская первые: {} , размер списка: {}", from, size);
         return categoryRepository.getAllCategories(from, size);
     }
 
     @Override
     public Category getCategoryById(Long catId) {
+        log.info("Выполняется поиск всех категории событий Id = {}", catId);
         return adminService.findCategoryById(catId);
     }
 
     @Override
     public List<Compilation> getCompilations(Boolean pinned, Integer from, Integer size) {
         if (pinned) {
+            log.info("Выполняется поиск закрепленных категорий событий пропуская первые: {}, " +
+                    "размер списка: {}", from, size);
             List<Compilation> pinnedCompilations = compilationRepository.getAllPinnedCompilations(from, size);
             return addCompEvents(pinnedCompilations);
         }
+        log.info("Выполняется поиск всех категорий событий пропуская первые: {} , размер списка: {}", from, size);
         List<Compilation> allCompilations = compilationRepository.getAllCompilations(from, size);
         return addCompEvents(allCompilations);
     }
 
     @Override
     public Compilation getCompilationById(Long compId) {
+        log.info("Выполняется поиск категории событий Id = {}", compId);
         Compilation compilation = compilationRepository.findById(compId).orElseThrow(() ->
                 new ObjectNotFoundException(String.format("Compilation with id=%s was not found", compId)));
         List<EventShortDto> compEvents = compEventDAO.getAllEventsId(compId)
@@ -79,6 +85,7 @@ public class PublicServiceImpl implements PublicService {
     }
 
     public List<Compilation> addCompEvents(List<Compilation> compilations) {
+        log.info("Выполняется поиск и добавленние событий к категориям из списка: {}", compilations);
         for(Compilation compilation : compilations) {
             List<Long> compEvIds = compEventDAO.getAllEventsId(compilation.getId());
             List<Event> compEvents = new ArrayList<>();

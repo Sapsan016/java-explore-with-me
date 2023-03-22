@@ -6,8 +6,10 @@ import org.springframework.web.bind.annotation.*;
 import ru.practicum.dto.events.EventFullDto;
 import ru.practicum.dto.events.EventShortDto;
 import ru.practicum.dto.events.NewEventDto;
+import ru.practicum.dto.events.requests.ParticipationRequestDto;
 import ru.practicum.dto.events.requests.UpdateEventRequest;
 import ru.practicum.mappers.EventMapper;
+import ru.practicum.mappers.RequestMapper;
 
 import javax.validation.Valid;
 import java.util.List;
@@ -58,4 +60,14 @@ public class PrivateController {
                 eventId, userId);
         return EventMapper.toEventFullDto(privateService.updateEvent(updateEventDto, userId, eventId));
     }
+
+    @PostMapping("/{userId}/requests")
+    @ResponseStatus(HttpStatus.CREATED)
+    public ParticipationRequestDto addRequest(@PathVariable Long userId,
+                                              @RequestParam Long eventId) {
+        log.info("PublicController: Получен новый запрос на участие в событии Id = {} от пользователя Id = {}",
+                eventId, userId);
+        return RequestMapper.toDto(privateService.addRequest(userId, eventId));
+    }
+
 }

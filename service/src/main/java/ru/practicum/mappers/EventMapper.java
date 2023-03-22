@@ -4,7 +4,7 @@ import ru.practicum.dto.events.EventFullDto;
 import ru.practicum.dto.events.EventShortDto;
 import ru.practicum.dto.events.NewEventDto;
 import ru.practicum.model.Event;
-import ru.practicum.model.EventState;
+import ru.practicum.dto.events.states.EventState;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;

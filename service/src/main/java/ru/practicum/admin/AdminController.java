@@ -17,7 +17,6 @@ import ru.practicum.mappers.EventMapper;
 import ru.practicum.mappers.UserMapper;
 
 import javax.validation.Valid;
-import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.List;

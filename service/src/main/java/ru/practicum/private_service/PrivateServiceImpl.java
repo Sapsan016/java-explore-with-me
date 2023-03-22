@@ -103,8 +103,8 @@ public class PrivateServiceImpl implements PrivateService {
             if (requestCount.equals(requestedEvent.getParticipantLimit()))
                 throw new IllegalArgumentException("The event's participation limit has reached.");
         }
-        ParticipationRequest requestToAdd = new ParticipationRequest(null, LocalDateTime.now(),eventId,
-                userId,null);
+        ParticipationRequest requestToAdd = new ParticipationRequest(null, LocalDateTime.now(), eventId,
+                userId, null);
         if (!requestedEvent.getRequestModeration()) {
             requestToAdd.setStatus(RequestState.CONFIRMED);
             requestRepository.save(requestToAdd);
@@ -115,7 +115,6 @@ public class PrivateServiceImpl implements PrivateService {
         requestRepository.save(requestToAdd);
         log.info("Добавлен запрос с Id = {} на участие в событии с Id = {}", requestToAdd.getId(), eventId);
         return requestToAdd;
-
     }
 
     @Override
@@ -123,5 +122,15 @@ public class PrivateServiceImpl implements PrivateService {
         adminService.findUserById(userId);
         log.info("Выполняется поиск запросов пользователя с Id = {}", userId);
         return requestRepository.findParticipationRequestsByRequester(userId);
+    }
+
+    @Override
+    public ParticipationRequest cancelRequest(Long userId, Long requestId) {
+        adminService.findUserById(userId);
+        ParticipationRequest requestToCancel = requestRepository.findById(requestId).orElseThrow(() ->
+                new ObjectNotFoundException(String.format("Event with id=%s was not found", requestId)));
+        requestToCancel.setStatus(RequestState.CANCELED);
+        requestRepository.save(requestToCancel);
+        return requestToCancel;
     }
 }

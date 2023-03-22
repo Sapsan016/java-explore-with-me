@@ -72,11 +72,19 @@ public class PrivateController {
 
     @GetMapping("/{userId}/requests")
     public List<ParticipationRequestDto> getUserRequest(@PathVariable Long userId) {
-        log.info("PublicController: Получен запрос на поиск запросов, добавленных пользователем с Id = {}", userId);
+        log.info("PublicController: Получен поиск запросов, добавленных пользователем с Id = {}", userId);
         return privateService.getUserRequests(userId)
                 .stream()
                 .map(RequestMapper::toDto)
                 .collect(Collectors.toList());
+    }
+
+    @PatchMapping("/{userId}/requests/{requestId}/cancel")
+    public ParticipationRequestDto cancelRequest(@PathVariable Long userId,
+                                                 @PathVariable Long requestId) {
+        log.info("PublicController: Получено удаление поиск запроса с Id = {}, " +
+                "от пользователя с Id = {}", requestId, userId);
+        return RequestMapper.toDto(privateService.cancelRequest(userId, requestId));
     }
 
 }

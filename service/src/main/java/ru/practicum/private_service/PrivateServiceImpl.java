@@ -118,4 +118,10 @@ public class PrivateServiceImpl implements PrivateService {
 
     }
 
+    @Override
+    public List<ParticipationRequest> getUserRequests(Long userId) {
+        adminService.findUserById(userId);
+        log.info("Выполняется поиск запросов пользователя с Id = {}", userId);
+        return requestRepository.findParticipationRequestsByRequester(userId);
+    }
 }

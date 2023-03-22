@@ -5,6 +5,7 @@ import ru.practicum.dto.events.requests.UpdateEventRequest;
 import ru.practicum.model.Event;
 import ru.practicum.model.ParticipationRequest;
 
+import java.util.Collection;
 import java.util.List;
 
 public interface PrivateService {
@@ -20,4 +21,5 @@ public interface PrivateService {
 
     ParticipationRequest addRequest(Long userId, Long eventId);
 
+    List<ParticipationRequest> getUserRequests(Long userId);
 }

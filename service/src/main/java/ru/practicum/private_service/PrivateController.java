@@ -70,4 +70,13 @@ public class PrivateController {
         return RequestMapper.toDto(privateService.addRequest(userId, eventId));
     }
 
+    @GetMapping("/{userId}/requests")
+    public List<ParticipationRequestDto> getUserRequest(@PathVariable Long userId) {
+        log.info("PublicController: Получен запрос на поиск запросов, добавленных пользователем с Id = {}", userId);
+        return privateService.getUserRequests(userId)
+                .stream()
+                .map(RequestMapper::toDto)
+                .collect(Collectors.toList());
+    }
+
 }

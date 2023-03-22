@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
 
+import javax.validation.constraints.NotBlank;
 import java.util.List;
 
 @Data
@@ -17,7 +18,7 @@ public class NewCompilationDto {
     List<Long> events;
 
     Boolean pinned;
-
+    @NotBlank(message = "Field: title. Error: must not be blank. Value: null")
     String title;
 
 }

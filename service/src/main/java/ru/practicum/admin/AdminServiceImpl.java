@@ -221,7 +221,7 @@ public class AdminServiceImpl implements AdminService {
             compToAlter.setTitle(newCompDto.getTitle());
         compilationRepository.save(compToAlter);
         log.info("Обновлена подборка событий с Id = {}", compToAlter.getId());
-        if (events != null) {
+        if (events.size() > 0 ) {
             compEventDAO.removeCompEvents(compId);
             return addEventsToCompilation(compToAlter, events);
         }

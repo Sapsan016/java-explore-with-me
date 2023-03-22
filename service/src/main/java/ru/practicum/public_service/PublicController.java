@@ -3,7 +3,9 @@ package ru.practicum.public_service;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.dto.category.CatDto;
+import ru.practicum.dto.compilations.CompilationDto;
 import ru.practicum.mappers.CatMapper;
+import ru.practicum.mappers.CompilationMapper;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -34,5 +36,18 @@ public class PublicController {
     CatDto getCategoryById(@PathVariable Long catId) {
         log.info("PublicController: Получен запрос на поиск категории с Id = {}", catId);
         return CatMapper.toCatDto(publicService.getCategoryById(catId));
+    }
+
+    @GetMapping("/compilations")
+    public List<CompilationDto> getCompilations(@RequestParam(defaultValue = "false") Boolean pinned,
+                                                @RequestParam(defaultValue = "0") Integer from,
+                                                @RequestParam(defaultValue = "10") Integer size) {
+        log.info("PublicController: Получен запрос на поиск подборок событий, закрепленных {}, " +
+                "пропуская первые {}, размер списка = {}", pinned, from, size);
+
+        return publicService.getCompilations(pinned, from, size)
+                .stream()
+                .map(CompilationMapper::toDto)
+                .collect(Collectors.toList());
     }
 }

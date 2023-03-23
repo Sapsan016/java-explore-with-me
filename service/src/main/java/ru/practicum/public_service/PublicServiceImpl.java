@@ -113,6 +113,13 @@ public class PublicServiceImpl implements PublicService {
         return filterEvents(foundEvents, categories, paid,onlyAvailable,sort,from,size);
     }
 
+    @Override
+    public Event getEventById(Long eventId) {
+        log.info("Выполняется поиск события Id = {}", eventId);
+        return eventRepository.findById(eventId).orElseThrow(() ->
+                new ObjectNotFoundException(String.format("Compilation with id=%s was not found", eventId)));
+    }
+
     private List<Event> filterEvents(List<Event> foundEvents, Long[] categories, Boolean paid, Boolean onlyAvailable,
                                      String sort, Integer from, Integer size) {
         if (categories.length != 0) {

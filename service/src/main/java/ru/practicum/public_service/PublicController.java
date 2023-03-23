@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.dto.category.CatDto;
 import ru.practicum.dto.compilations.CompilationDto;
+import ru.practicum.dto.events.EventFullDto;
 import ru.practicum.dto.events.EventShortDto;
 import ru.practicum.mappers.CatMapper;
 import ru.practicum.mappers.CompilationMapper;
@@ -105,8 +106,12 @@ public class PublicController {
                 .stream()
                 .map(EventMapper::toEventShortDto)
                 .collect(Collectors.toList());
+    }
 
-
+    @GetMapping("/events/{eventId}")
+    public EventFullDto getEventById(@PathVariable Long eventId) {
+        log.info("PublicController: Получен запрос на поиск полной информации о событии с Id = {}", eventId);
+        return EventMapper.toEventFullDto(publicService.getEventById(eventId));
     }
 }
 

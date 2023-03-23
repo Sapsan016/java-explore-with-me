@@ -105,7 +105,7 @@ public class AdminController {
     }
 
     @PatchMapping("/compilations/{compId}")
-    public CompilationDto alterCompilation(@RequestBody @Valid NewCompilationDto newCompDto,
+    public CompilationDto alterCompilation(@RequestBody NewCompilationDto newCompDto,
                                            @PathVariable Long compId) {
         log.info("AdminController: Получен запрос на изменение подборки ID = {}", compId);
         return CompilationMapper.toDto(adminService.alterCompilation(compId, newCompDto));

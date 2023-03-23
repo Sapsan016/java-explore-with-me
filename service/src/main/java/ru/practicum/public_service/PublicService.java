@@ -5,7 +5,6 @@ import ru.practicum.model.Compilation;
 import ru.practicum.model.Event;
 
 import java.time.LocalDateTime;
-import java.util.Collection;
 import java.util.List;
 
 public interface PublicService {
@@ -28,4 +27,6 @@ public interface PublicService {
     List<Event> searchEventsWithStartAndEndRange(String text, Long[] categories, Boolean paid, LocalDateTime startRange,
                                                  LocalDateTime endRange, Boolean onlyAvailable, String sort,
                                                  Integer from, Integer size);
+
+    Event getEventById(Long eventId);
 }

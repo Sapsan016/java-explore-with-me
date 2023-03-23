@@ -28,4 +28,6 @@ public interface PrivateService {
 
     EventRequestStatusUpdateResult updateRequest(EventRequestStatusUpdateRequest updateRequest,
                                                  Long userId, Long eventId);
+
+    List<ParticipationRequest> getUserEventRequests(Long userId, Long eventId);
 }

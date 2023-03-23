@@ -124,13 +124,13 @@ public class PrivateServiceImpl implements PrivateService {
         }
         requestToAdd.setStatus(RequestState.PENDING);
         requestRepository.save(requestToAdd);
-        log.info("Добавлен запрос с Id = {} на участие в событии с Id = {}", requestToAdd.getId(), eventId);
+        log.info("Добавлен запрос с Id = {} на участие в событии с Id = {} от пользователя с Id = {}",
+                requestToAdd.getId(), eventId, userId);
         return requestToAdd;
     }
 
     @Override
     public List<ParticipationRequest> getUserRequests(Long userId) {
-        adminService.findUserById(userId);
         log.info("Выполняется поиск запросов пользователя с Id = {}", userId);
         return requestRepository.findParticipationRequestsByRequester(userId);
     }
@@ -148,7 +148,6 @@ public class PrivateServiceImpl implements PrivateService {
     @Override
     public EventRequestStatusUpdateResult updateRequest(EventRequestStatusUpdateRequest updateRequest,
                                                         Long userId, Long eventId) {
-        adminService.findUserById(userId);
         Event requestedEvent = findEventById(eventId);
         checkRequestsCount(requestedEvent);
         List<ParticipationRequest> requestsToConfirm = requestRepository.findAllById(updateRequest.getRequestIds());
@@ -184,11 +183,17 @@ public class PrivateServiceImpl implements PrivateService {
         return new EventRequestStatusUpdateResult(confirmedRequests, rejectedRequests);
     }
 
+    @Override
+    public List<ParticipationRequest> getUserEventRequests(Long userId, Long eventId) {
+        log.info("Выполняется поиск запросов пользователя с Id = {}, на участие в событии с Id = {} ", userId, eventId);
+        return requestRepository.findParticipationRequestsByRequesterAndEvent(userId, eventId);
+    }
+
+
     private void checkRequestsCount(Event requestedEvent) {
         Integer requestCount = requestRepository.countParticipationRequestsByEvent(requestedEvent.getId());
         if (requestCount.equals(requestedEvent.getParticipantLimit()))
             throw new IllegalArgumentException("The event's participation limit has reached.");
     }
-
 
 }

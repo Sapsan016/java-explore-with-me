@@ -3,6 +3,7 @@ package ru.practicum.admin;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import ru.practicum.dto.category.AddCatDto;
 import ru.practicum.dto.compilations.NewCompilationDto;
@@ -63,6 +64,8 @@ public class AdminServiceImpl implements AdminService {
 
     @Override
     public void removeCategory(Long catId) {
+        if(!eventRepository.getEventsByCategoryId(catId, 0, 1).isEmpty())
+            throw new DataIntegrityViolationException("The category is not empty");
         Category catToRemove = findCategoryById(catId);
         categoryRepository.delete(catToRemove);
         log.info("Удалена категория с Id = {}", catId);
@@ -326,7 +329,7 @@ public class AdminServiceImpl implements AdminService {
 
     @Override
     public Event checkUpdateEvent(Event eventToUpdate, UpdateEventRequest newEventDto) {
-        if (eventToUpdate.getState().equals(EventState.PUBLISHED))
+        if (!eventToUpdate.getState().equals(EventState.PENDING))
             throw new IllegalArgumentException("Only pending or canceled events can be changed");
         if (newEventDto.getAnnotation() != null)
             eventToUpdate.setAnnotation(newEventDto.getAnnotation());

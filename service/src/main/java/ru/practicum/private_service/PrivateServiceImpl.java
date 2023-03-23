@@ -22,7 +22,6 @@ import ru.practicum.repositories.LocationRepository;
 import ru.practicum.repositories.RequestRepository;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -100,8 +99,12 @@ public class PrivateServiceImpl implements PrivateService {
 
     @Override
     public ParticipationRequest addRequest(Long userId, Long eventId) {
-        Event requestedEvent = findEventById(eventId);
         log.info("Выполняются проверки запроса от пользователя Id = {} на участие в событии Id = {}", userId, eventId);
+       List<ParticipationRequest> userRequests = requestRepository.findParticipationRequestsByRequester(userId);
+       if (userRequests.stream().anyMatch(request -> request.getEvent().equals(eventId)))
+           throw new IllegalArgumentException(String.format("The request for participation in event with id=%s " +
+                   "was already added", eventId));
+        Event requestedEvent = findEventById(eventId);
         if (requestedEvent.getUser().getId().equals(userId))
             throw new IllegalArgumentException("The requester can't participate in his own event.");
         if (requestedEvent.getState().equals(EventState.PENDING))

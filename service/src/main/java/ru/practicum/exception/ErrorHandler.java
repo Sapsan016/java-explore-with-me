@@ -22,7 +22,7 @@ public class ErrorHandler {
     }
 
     @ExceptionHandler
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseStatus(HttpStatus.CONFLICT)
     public ErrorResponse badRequest(final MethodArgumentNotValidException e) {
         return new ErrorResponse(e.getMessage(),
                 "BAD_REQUEST", "Incorrectly made request.", LocalDateTime.now().format(FORMATTER));

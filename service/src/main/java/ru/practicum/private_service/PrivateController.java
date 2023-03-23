@@ -98,16 +98,15 @@ public class PrivateController {
         return privateService.updateRequest(updateRequest, userId, eventId);
 
     }
+
     @GetMapping("/{userId}/events/{eventId}/requests")
     public List<ParticipationRequestDto> getUserEventRequest(@PathVariable Long userId,
-                                                        @PathVariable Long eventId) {
+                                                             @PathVariable Long eventId) {
         log.info("PublicController: Получен поиск информации о запросах на участие " +
-                "в событии с Id = {}, добавленном пользователем Id = {}",eventId, userId);
-        return privateService.getUserEventRequests(userId,eventId)
+                "в событии с Id = {}, добавленном пользователем Id = {}", eventId, userId);
+        return privateService.getUserEventRequests(userId, eventId)
                 .stream()
                 .map(RequestMapper::toDto)
                 .collect(Collectors.toList());
     }
-
-
 }

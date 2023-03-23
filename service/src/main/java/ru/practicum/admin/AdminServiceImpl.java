@@ -323,14 +323,14 @@ public class AdminServiceImpl implements AdminService {
         if (updateEventDto.getStateAction().equals(EventActionStates.REJECT_EVENT))
             eventToUpdate.setState(EventState.CANCELED);
         eventRepository.save(eventToUpdate);
-        log.info("Обновлено событие с Id = {}", eventToUpdate.getId());
+        log.info("Обновлено событие: {}", eventToUpdate);
         return eventToUpdate;
     }
 
     @Override
     public Event checkUpdateEvent(Event eventToUpdate, UpdateEventRequest newEventDto) {
-        if (!eventToUpdate.getState().equals(EventState.PENDING))
-            throw new IllegalArgumentException("Only pending or canceled events can be changed");
+        if (eventToUpdate.getState().equals(EventState.PUBLISHED))
+            throw new IllegalArgumentException("The event was already published");
         if (newEventDto.getAnnotation() != null)
             eventToUpdate.setAnnotation(newEventDto.getAnnotation());
         if (newEventDto.getCategory() != null)

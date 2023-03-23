@@ -56,8 +56,8 @@ public class PrivateController {
     @PatchMapping("/{userId}/events/{eventId}")
     public EventFullDto updateEvent(@RequestBody @Valid UpdateEventRequest updateEventDto, @PathVariable Long userId,
                                     @PathVariable Long eventId) {
-        log.info("PublicController: Получен запрос на обновления события Id = {} от пользователя Id = {}",
-                eventId, userId);
+        log.info("PublicController: Получен запрос на обновления события {} от пользователя Id = {}",
+                updateEventDto, userId);
         return EventMapper.toEventFullDto(privateService.updateEvent(updateEventDto, userId, eventId));
     }
 

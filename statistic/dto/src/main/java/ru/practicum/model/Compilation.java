@@ -20,11 +20,13 @@ public class Compilation {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
 
+    @Transient
+    List<EventShortDto> events;
+
     Boolean pinned;
 
     String title;
 
-    @Transient
-    List<EventShortDto> events;
+
 
 }

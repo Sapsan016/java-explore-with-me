@@ -9,9 +9,10 @@ public class CompilationMapper {
     public static Compilation toCompilation(NewCompilationDto newCompilationDto) {
         return new Compilation(
                 null,
+                null,
                 newCompilationDto.getPinned(),
-                newCompilationDto.getTitle(),
-                null
+                newCompilationDto.getTitle()
+
         );
     }
 

@@ -92,7 +92,7 @@ public class AdminController {
 
     @PostMapping("/compilations")
     @ResponseStatus(HttpStatus.CREATED)
-    public CompilationDto addCompilation(@RequestBody NewCompilationDto newCompilationDto) {
+    public CompilationDto addCompilation(@RequestBody @Valid NewCompilationDto newCompilationDto) {
         log.info("AdminController: Получен запрос на создание подборки {}", newCompilationDto.toString());
         return CompilationMapper.toDto(adminService.addCompilation(newCompilationDto));
     }
@@ -105,8 +105,8 @@ public class AdminController {
     }
 
     @PatchMapping("/compilations/{compId}")
-    public CompilationDto alterCompilation(@PathVariable Long compId,
-                                           @RequestBody @Valid NewCompilationDto newCompDto) {
+    public CompilationDto alterCompilation(@RequestBody @Valid NewCompilationDto newCompDto,
+                                           @PathVariable Long compId) {
         log.info("AdminController: Получен запрос на изменение подборки ID = {}", compId);
         return CompilationMapper.toDto(adminService.alterCompilation(compId, newCompDto));
     }

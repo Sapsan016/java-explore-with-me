@@ -78,6 +78,8 @@ public class PrivateServiceImpl implements PrivateService {
 
         if (newEventDto.getStateAction().equals(EventActionStates.CANCEL_REVIEW))
             eventToUpdate.setState(EventState.CANCELED);
+        if (newEventDto.getStateAction().equals(EventActionStates.SEND_TO_REVIEW))
+            eventToUpdate.setState(EventState.PENDING);
 
         eventRepository.save(eventToUpdate);
         log.info("Обновлено событие с Id = {}", eventToUpdate.getId());

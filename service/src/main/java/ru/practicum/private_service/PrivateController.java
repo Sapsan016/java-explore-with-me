@@ -6,6 +6,8 @@ import org.springframework.web.bind.annotation.*;
 import ru.practicum.dto.events.EventFullDto;
 import ru.practicum.dto.events.EventShortDto;
 import ru.practicum.dto.events.NewEventDto;
+import ru.practicum.dto.events.requests.EventRequestStatusUpdateRequest;
+import ru.practicum.dto.events.requests.EventRequestStatusUpdateResult;
 import ru.practicum.dto.events.requests.ParticipationRequestDto;
 import ru.practicum.dto.events.requests.UpdateEventRequest;
 import ru.practicum.mappers.EventMapper;
@@ -82,9 +84,20 @@ public class PrivateController {
     @PatchMapping("/{userId}/requests/{requestId}/cancel")
     public ParticipationRequestDto cancelRequest(@PathVariable Long userId,
                                                  @PathVariable Long requestId) {
-        log.info("PublicController: Получено удаление поиск запроса с Id = {}, " +
-                "от пользователя с Id = {}", requestId, userId);
+        log.info("PublicController: Получено удаление поиск запроса с Id = {}, от пользователя с Id = {}",
+                requestId, userId);
         return RequestMapper.toDto(privateService.cancelRequest(userId, requestId));
     }
+
+    @PatchMapping("/{userId}/events/{eventId}/requests")
+    public EventRequestStatusUpdateResult updateRequest(@RequestBody EventRequestStatusUpdateRequest updateRequest,
+                                                        @PathVariable Long userId,
+                                                        @PathVariable Long eventId) {
+        log.info("PublicController: Получено обновление запроса {} на участие в событии с Id = {}, " +
+                "от пользователя с Id = {}", updateRequest, eventId, userId);
+        return privateService.updateRequest(updateRequest, userId, eventId);
+
+    }
+
 
 }

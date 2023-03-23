@@ -20,7 +20,7 @@ public class EventMapper {
                 null,
                 newEventDto.getAnnotation(),
                 null,
-                null,
+                0,
                 LocalDateTime.now(),
                 newEventDto.getDescription(),
                 newEventDto.getEventDate(),
@@ -32,7 +32,7 @@ public class EventMapper {
                 newEventDto.getRequestModeration(),
                 EventState.PENDING,
                 newEventDto.getTitle(),
-                null
+                0
         );
     }
 

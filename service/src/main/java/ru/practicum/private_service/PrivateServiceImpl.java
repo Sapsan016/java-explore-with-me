@@ -100,10 +100,10 @@ public class PrivateServiceImpl implements PrivateService {
     @Override
     public ParticipationRequest addRequest(Long userId, Long eventId) {
         log.info("Выполняются проверки запроса от пользователя Id = {} на участие в событии Id = {}", userId, eventId);
-       List<ParticipationRequest> userRequests = requestRepository.findParticipationRequestsByRequester(userId);
-       if (userRequests.stream().anyMatch(request -> request.getEvent().equals(eventId)))
-           throw new IllegalArgumentException(String.format("The request for participation in event with id=%s " +
-                   "was already added", eventId));
+        List<ParticipationRequest> userRequests = requestRepository.findParticipationRequestsByRequester(userId);
+        if (userRequests.stream().anyMatch(request -> request.getEvent().equals(eventId)))
+            throw new IllegalArgumentException(String.format("The request for participation in event with id=%s " +
+                    "was already added", eventId));
         Event requestedEvent = findEventById(eventId);
         if (requestedEvent.getUser().getId().equals(userId))
             throw new IllegalArgumentException("The requester can't participate in his own event.");
@@ -148,17 +148,34 @@ public class PrivateServiceImpl implements PrivateService {
     @Override
     public EventRequestStatusUpdateResult updateRequest(EventRequestStatusUpdateRequest updateRequest,
                                                         Long userId, Long eventId) {
+        List<ParticipationRequestDto> confirmedRequests;
+        List<ParticipationRequestDto> rejectedRequests;
         Event requestedEvent = findEventById(eventId);
+        if (requestedEvent.getRequestModeration().equals(false) || requestedEvent.getParticipantLimit() == 0) {
+            log.info("Для запросов на участи в событии Id = {} модерация запросов на участие не требуется", eventId);
+            updateRequestsWithoutModeration(requestedEvent, updateRequest);
+            confirmedRequests = requestRepository
+                    .findParticipationRequestsByStatus(RequestState.CONFIRMED).stream()
+                    .map(RequestMapper::toDto)
+                    .collect(Collectors.toList());
+            rejectedRequests = requestRepository
+                    .findParticipationRequestsByStatus(RequestState.REJECTED).stream()
+                    .map(RequestMapper::toDto)
+                    .collect(Collectors.toList());
+            return new EventRequestStatusUpdateResult(confirmedRequests, rejectedRequests);
+        }
         checkRequestsCount(requestedEvent);
-        List<ParticipationRequest> requestsToConfirm = requestRepository.findAllById(updateRequest.getRequestIds());
+
+        List<ParticipationRequest> requestsToConfirm = requestRepository.findAllById(updateRequest.getRequestIds())
+                .stream().filter(request -> request.getStatus().equals(RequestState.PENDING))
+                .collect(Collectors.toList());
+
         for (int i = 0; i < requestsToConfirm.size(); i++) {
             ParticipationRequest request = requestsToConfirm.get(i);
-            if (!request.getStatus().equals(RequestState.PENDING))
-                throw new IllegalArgumentException("The request is not in a PENDING state.");
             request.setStatus(updateRequest.getStatus());
-            requestRepository.save(request);
-            if (updateRequest.getStatus().equals(RequestState.CONFIRMED))
-                requestedEvent.setConfirmedRequests((requestedEvent.getConfirmedRequests() + 1));
+            log.info("Запрос на участие с Id = {} подтвержден", request.getId());
+            requestedEvent.setConfirmedRequests((requestedEvent.getConfirmedRequests() + 1));
+
             try {
                 checkRequestsCount(requestedEvent);
             } catch (IllegalArgumentException e) {
@@ -166,18 +183,19 @@ public class PrivateServiceImpl implements PrivateService {
                 for (int j = i + 1; j < requestsToConfirm.size(); j++) {
                     ParticipationRequest rejectedRequest = requestsToConfirm.get(j);
                     rejectedRequest.setStatus(RequestState.REJECTED);
-                    requestRepository.save(rejectedRequest);
                 }
             }
         }
+        requestRepository.saveAll(requestsToConfirm);
+        eventRepository.save(requestedEvent);
 
-        List<ParticipationRequestDto> confirmedRequests = requestRepository
+        confirmedRequests = requestRepository
                 .findParticipationRequestsByStatus(RequestState.CONFIRMED).stream()
-                .map(RequestMapper :: toDto)
+                .map(RequestMapper::toDto)
                 .collect(Collectors.toList());
-        List<ParticipationRequestDto> rejectedRequests = requestRepository
+        rejectedRequests = requestRepository
                 .findParticipationRequestsByStatus(RequestState.REJECTED).stream()
-                .map(RequestMapper :: toDto)
+                .map(RequestMapper::toDto)
                 .collect(Collectors.toList());
 
         return new EventRequestStatusUpdateResult(confirmedRequests, rejectedRequests);
@@ -185,8 +203,8 @@ public class PrivateServiceImpl implements PrivateService {
 
     @Override
     public List<ParticipationRequest> getUserEventRequests(Long userId, Long eventId) {
-        log.info("Выполняется поиск запросов пользователя с Id = {}, на участие в событии с Id = {} ", userId, eventId);
-        return requestRepository.findParticipationRequestsByRequesterAndEvent(userId, eventId);
+        log.info("Выполняется поиск запросов, на участие в событии с Id = {} ", eventId);
+        return requestRepository.findParticipationRequestsByEvent(eventId);
     }
 
 
@@ -194,6 +212,21 @@ public class PrivateServiceImpl implements PrivateService {
         Integer requestCount = requestRepository.countParticipationRequestsByEvent(requestedEvent.getId());
         if (requestCount.equals(requestedEvent.getParticipantLimit()))
             throw new IllegalArgumentException("The event's participation limit has reached.");
+    }
+
+    private void updateRequestsWithoutModeration(Event event, EventRequestStatusUpdateRequest updateRequest) {
+        List<ParticipationRequest> requests = requestRepository.findAllById(updateRequest.getRequestIds());
+        requests.stream()
+                .filter(request -> request.getStatus().equals(RequestState.PENDING))
+                .forEach(request -> request.setStatus(RequestState.CONFIRMED));
+        requestRepository.saveAll(requests);
+        log.info("Для запросов c Id: {} установлен статус CONFIRMED", requests);
+
+        event.setConfirmedRequests((event.getConfirmedRequests() +
+                updateRequest.getRequestIds().size()));
+        eventRepository.save(event);
+        log.info("Для события c Id = {} добавлено {} подтвержденных запросов", event.getId(),
+                updateRequest.getRequestIds().size());
     }
 
 }

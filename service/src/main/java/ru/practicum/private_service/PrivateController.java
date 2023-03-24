@@ -93,8 +93,8 @@ public class PrivateController {
     public EventRequestStatusUpdateResult updateRequest(@RequestBody EventRequestStatusUpdateRequest updateRequest,
                                                         @PathVariable Long userId,
                                                         @PathVariable Long eventId) {
-        log.info("PublicController: Получено обновление статуса запросов на участие в событии с Id = {}, " +
-                "добавленном пользователем с Id = {}", eventId, userId);
+        log.info("PublicController: Получено обновление статуса запросов {} на участие в событии с Id = {}, " +
+                "добавленном пользователем с Id = {}", updateRequest, eventId, userId);
         return privateService.updateRequest(updateRequest, userId, eventId);
 
     }

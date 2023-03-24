@@ -311,14 +311,16 @@ public class AdminServiceImpl implements AdminService {
     public Event updateEvent(UpdateEventRequest updateEventDto, Long eventId) {
         Event eventToUpdate = eventRepository.findById(eventId).orElseThrow(() ->
                 new ObjectNotFoundException(String.format("Event with id=%s was not found", eventId)));
-
-
+        if(eventToUpdate.getState().equals(EventState.CANCELED))
+            throw new IllegalArgumentException("The event was cancelled");
         if (eventToUpdate.getEventDate().isBefore(LocalDateTime.now().plusHours(1)))
             throw new IllegalArgumentException("The event starts in less than 1 hour from now " +
                     "and could not be changed");
         eventToUpdate = checkUpdateEvent(eventToUpdate, updateEventDto);
-        if (updateEventDto.getStateAction().equals(EventActionStates.PUBLISH_EVENT))
+        if (updateEventDto.getStateAction().equals(EventActionStates.PUBLISH_EVENT)) {
             eventToUpdate.setState(EventState.PUBLISHED);
+            eventToUpdate.setPublishedOn(LocalDateTime.now());
+        }
         if (updateEventDto.getStateAction().equals(EventActionStates.REJECT_EVENT))
             eventToUpdate.setState(EventState.CANCELED);
         eventRepository.save(eventToUpdate);
@@ -330,8 +332,7 @@ public class AdminServiceImpl implements AdminService {
     public Event checkUpdateEvent(Event eventToUpdate, UpdateEventRequest newEventDto) {
         if (eventToUpdate.getState().equals(EventState.PUBLISHED))
             throw new IllegalArgumentException("The event was already published");
-        if(eventToUpdate.getState().equals(EventState.CANCELED))
-            throw new IllegalArgumentException("The event was cancelled");
+
         if (newEventDto.getAnnotation() != null)
             eventToUpdate.setAnnotation(newEventDto.getAnnotation());
         if (newEventDto.getCategory() != null)

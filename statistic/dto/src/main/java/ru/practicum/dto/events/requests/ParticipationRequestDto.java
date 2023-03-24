@@ -10,7 +10,7 @@ import lombok.experimental.FieldDefaults;
 @AllArgsConstructor
 @NoArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class ParticipationRequestDto {
+public class ParticipationRequestDto implements Comparable<ParticipationRequestDto>{
 
     String created;
 
@@ -23,4 +23,8 @@ public class ParticipationRequestDto {
     String status;
 
 
+    @Override
+    public int compareTo(ParticipationRequestDto otherDto) {
+        return Long.compare(getId(), otherDto.getId());
+    }
 }

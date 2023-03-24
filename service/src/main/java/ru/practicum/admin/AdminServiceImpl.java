@@ -317,7 +317,6 @@ public class AdminServiceImpl implements AdminService {
             throw new IllegalArgumentException("The event starts in less than 1 hour from now " +
                     "and could not be changed");
         eventToUpdate = checkUpdateEvent(eventToUpdate, updateEventDto);
-
         if (updateEventDto.getStateAction().equals(EventActionStates.PUBLISH_EVENT))
             eventToUpdate.setState(EventState.PUBLISHED);
         if (updateEventDto.getStateAction().equals(EventActionStates.REJECT_EVENT))
@@ -331,6 +330,8 @@ public class AdminServiceImpl implements AdminService {
     public Event checkUpdateEvent(Event eventToUpdate, UpdateEventRequest newEventDto) {
         if (eventToUpdate.getState().equals(EventState.PUBLISHED))
             throw new IllegalArgumentException("The event was already published");
+        if(eventToUpdate.getState().equals(EventState.CANCELED))
+            throw new IllegalArgumentException("The event was cancelled");
         if (newEventDto.getAnnotation() != null)
             eventToUpdate.setAnnotation(newEventDto.getAnnotation());
         if (newEventDto.getCategory() != null)

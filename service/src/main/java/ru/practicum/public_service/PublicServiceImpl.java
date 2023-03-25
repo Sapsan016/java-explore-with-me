@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.practicum.admin.AdminService;
 import ru.practicum.dto.events.EventShortDto;
+import ru.practicum.dto.events.states.RequestState;
 import ru.practicum.exception.ObjectNotFoundException;
 import ru.practicum.mappers.EventMapper;
 import ru.practicum.model.Category;
@@ -132,7 +133,7 @@ public class PublicServiceImpl implements PublicService {
         if (onlyAvailable) {
             foundEvents = foundEvents.stream()
                     .filter(event -> event.getParticipantLimit() > requestRepository
-                            .countParticipationRequestsByEvent(event.getId()))
+                            .countParticipationRequestsByEventAndStatus(event.getId(), RequestState.CONFIRMED))
                     .collect(Collectors.toList());
         }
         if (sort.equals("EVENT_DATE")) {

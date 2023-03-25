@@ -9,7 +9,7 @@ import java.util.List;
 
 public interface RequestRepository extends JpaRepository<ParticipationRequest, Long> {
 
-    Integer countParticipationRequestsByEvent(Long id);
+    Integer countParticipationRequestsByEventAndStatus(Long id, RequestState state);
 
     List<ParticipationRequest> findParticipationRequestsByRequester(Long userId);
 
@@ -19,10 +19,5 @@ public interface RequestRepository extends JpaRepository<ParticipationRequest, L
     @Query("select e from ParticipationRequest e " +
             "where e.status='PENDING' and e.id= ?1")
     ParticipationRequest findParticipationRequestsByIdAndStatus(Long requestId);
-
-
-
-
-
 
 }

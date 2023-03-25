@@ -104,26 +104,28 @@ public class PrivateServiceImpl implements PrivateService {
         log.info("Выполняются проверки запроса от пользователя Id = {} на участие в событии Id = {}", userId, eventId);
         List<ParticipationRequest> userRequests = requestRepository.findParticipationRequestsByRequester(userId);
         if (userRequests.stream().anyMatch(request -> request.getEvent().equals(eventId)))
-            throw new IllegalArgumentException(String.format("The request for participation by user in event with id=%s " +
-                    "was already added", eventId));
+            throw new IllegalArgumentException(String.format("The request for participation by user in event with " +
+                    "id=%s was already added", eventId));
         Event requestedEvent = findEventById(eventId);
         if (requestedEvent.getUser().getId().equals(userId))
             throw new IllegalArgumentException("The requester can't participate in his own event.");
         if (requestedEvent.getState().equals(EventState.PENDING))
             throw new IllegalArgumentException("The event is not published.");
+        if (requestedEvent.getParticipantLimit() != 0 && checkRequestsCount(requestedEvent)) {
+            log.error("The event's participation limit has been reached.");
+            throw new IllegalArgumentException("The event's participation limit has been reached.");
+        }
+
         ParticipationRequest requestToAdd = new ParticipationRequest(null, LocalDateTime.now(), eventId,
                 userId, null);
 
-        if (!requestedEvent.getRequestModeration() && requestedEvent.getParticipantLimit() == 0) {
+        if (!requestedEvent.getRequestModeration() || requestedEvent.getParticipantLimit() == 0) {
             requestToAdd.setStatus(RequestState.CONFIRMED);
             requestRepository.save(requestToAdd);
             requestedEvent.setConfirmedRequests((requestedEvent.getConfirmedRequests() + 1));
             log.info("Добавлен подтвержденный запрос с Id = {} на участие в событии с Id = {}",
                     requestToAdd.getId(), eventId);
             return requestToAdd;
-        }
-        if (requestedEvent.getParticipantLimit() != 0 && checkRequestsCount(requestedEvent)) {
-            throw new IllegalArgumentException("The event's participation limit has been reached.");
         }
 
 
@@ -166,9 +168,13 @@ public class PrivateServiceImpl implements PrivateService {
             ParticipationRequest request = requestsToConfirm.get(i);
             if (!request.getStatus().equals(RequestState.PENDING))
                 throw new DataIntegrityViolationException("The request was already confirmed or canceled");
+            if (checkRequestsCount(requestedEvent))
+                throw new IllegalArgumentException("The event's participation limit has been reached.");
             request.setStatus(updateRequest.getStatus());
             log.info("Запрос на участие с Id = {} подтвержден", request.getId());
             requestedEvent.setConfirmedRequests((requestedEvent.getConfirmedRequests() + 1));
+            requestRepository.save(request);
+
             if (checkRequestsCount(requestedEvent)) {
                 for (int j = i + 1; j < requestsToConfirm.size(); j++) {
                     ParticipationRequest rejectedRequest = requestsToConfirm.get(j);
@@ -206,7 +212,8 @@ public class PrivateServiceImpl implements PrivateService {
 
 
     private boolean checkRequestsCount(Event requestedEvent) {
-        Integer requestCount = requestRepository.countParticipationRequestsByEvent(requestedEvent.getId());
+        Integer requestCount = requestRepository.countParticipationRequestsByEventAndStatus(requestedEvent.getId(),
+                RequestState.CONFIRMED);
         return requestCount >= (requestedEvent.getParticipantLimit());
     }
 

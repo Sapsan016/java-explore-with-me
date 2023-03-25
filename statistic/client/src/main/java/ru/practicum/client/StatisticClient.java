@@ -16,6 +16,7 @@ public class StatisticClient {
     public StatisticClient(WebClient webClient) {
         this.webClient = webClient;
     }
+
     public ResponseEntity<Object> addEndpointHit(HitAddDto endpointHitDto) {
         return webClient.post()
                 .uri("/hit")
@@ -32,12 +33,5 @@ public class StatisticClient {
                 })
                 .block();
     }
-
-
-
-
-
-
-
 
 }

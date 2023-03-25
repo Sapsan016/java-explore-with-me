@@ -123,14 +123,14 @@ public class PublicController {
 
         }
         return publicService.searchEventsWithStartAndEndRange(text, categories, paid, LocalDateTime.parse(rangeStart,
-                                FORMATTER), LocalDateTime.parse(rangeEnd, FORMATTER), onlyAvailable, sort, from, size)
+                        FORMATTER), LocalDateTime.parse(rangeEnd, FORMATTER), onlyAvailable, sort, from, size)
                 .stream()
                 .map(EventMapper::toEventShortDto)
                 .collect(Collectors.toList());
     }
 
     @GetMapping("/events/{eventId}")
-    public EventFullDto getEventById(@PathVariable Long eventId,  HttpServletRequest request) {
+    public EventFullDto getEventById(@PathVariable Long eventId, HttpServletRequest request) {
         log.info("PublicController: Получен запрос на поиск полной информации о событии с Id = {}", eventId);
         log.info("client ip: {}", request.getRemoteAddr());
         log.info("endpoint path: {}", request.getRequestURI());

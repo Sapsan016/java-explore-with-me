@@ -32,6 +32,7 @@ public interface EventRepository extends JpaRepository<Event, Long> {
             "where e.state='PUBLISHED' and (lower(e.annotation) like lower(concat('%', ?1, '%')) " +
             " or lower(e.description) like lower(concat('%', ?1, '%'))) and e.eventDate>= ?2 and e.eventDate < ?3")
     List<Event> searchWithStartEnd(String text, LocalDateTime startRange, LocalDateTime endRange);
+
     @Query("select e from Event e " +
             "where e.state='PUBLISHED' and (lower(e.annotation) like lower(concat('%', ?1, '%')) " +
             " or lower(e.description) like lower(concat('%', ?1, '%'))) and e.eventDate>= ?2")
@@ -41,10 +42,6 @@ public interface EventRepository extends JpaRepository<Event, Long> {
             "where e.state='PUBLISHED' and (lower(e.annotation) like lower(concat('%', ?1, '%')) " +
             " or lower(e.description) like lower(concat('%', ?1, '%'))) and e.eventDate< ?2")
     List<Event> searchEventsBeforeEndRange(String text, LocalDateTime endRange);
-
-
-
-
 
 
 }

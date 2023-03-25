@@ -27,6 +27,7 @@ public class CompEventDAO {
         String sqlQuery = "select event_id from compilation_events where compilation_id = ?";
         return jdbcTemplate.query(sqlQuery, CompEventDAO::mapRowToId, compId);
     }
+
     public static Long mapRowToId(ResultSet resultSet, int rowNum) throws SQLException {
         return (resultSet.getLong("event_id"));
 

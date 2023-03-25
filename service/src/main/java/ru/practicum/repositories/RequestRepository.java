@@ -16,8 +16,5 @@ public interface RequestRepository extends JpaRepository<ParticipationRequest, L
     List<ParticipationRequest> findParticipationRequestsByStatus(RequestState state);
 
     List<ParticipationRequest> findParticipationRequestsByEvent(Long eventId);
-    @Query("select e from ParticipationRequest e " +
-            "where e.status='PENDING' and e.id= ?1")
-    ParticipationRequest findParticipationRequestsByIdAndStatus(Long requestId);
 
 }

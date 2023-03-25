@@ -64,7 +64,7 @@ public class AdminServiceImpl implements AdminService {
 
     @Override
     public void removeCategory(Long catId) {
-        if(!eventRepository.getEventsByCategoryId(catId, 0, 1).isEmpty())
+        if (!eventRepository.getEventsByCategoryId(catId, 0, 1).isEmpty())
             throw new DataIntegrityViolationException("The category is not empty");
         Category catToRemove = findCategoryById(catId);
         categoryRepository.delete(catToRemove);
@@ -114,18 +114,19 @@ public class AdminServiceImpl implements AdminService {
         }
     }
 
-    private void findEventsByUser(List <Event> foundEvents, Long [] users) {
+    private void findEventsByUser(List<Event> foundEvents, Long[] users) {
         for (Long user : users) {
             foundEvents.addAll(eventRepository.getAllEventsByUserId(user, 0, Integer.MAX_VALUE));
         }
     }
-    private void findEventsByState(List <Event> foundEvents, String [] states) {
+
+    private void findEventsByState(List<Event> foundEvents, String[] states) {
         for (String state : states) {
             foundEvents.addAll(eventRepository.findEventByState(state));
         }
     }
 
-    private void findEventsByCategoryAndFromSize(List <Event> foundEvents, Long [] categories, Integer from,
+    private void findEventsByCategoryAndFromSize(List<Event> foundEvents, Long[] categories, Integer from,
                                                  Integer size) {
         for (Long category : categories) {
             foundEvents.addAll(eventRepository.getEventsByCategoryId(category, from, size));
@@ -311,7 +312,7 @@ public class AdminServiceImpl implements AdminService {
     public Event updateEvent(UpdateEventRequest updateEventDto, Long eventId) {
         Event eventToUpdate = eventRepository.findById(eventId).orElseThrow(() ->
                 new ObjectNotFoundException(String.format("Event with id=%s was not found", eventId)));
-        if(eventToUpdate.getState().equals(EventState.CANCELED))
+        if (eventToUpdate.getState().equals(EventState.CANCELED))
             throw new IllegalArgumentException("The event was cancelled");
         if (eventToUpdate.getEventDate().isBefore(LocalDateTime.now().plusHours(1)))
             throw new IllegalArgumentException("The event starts in less than 1 hour from now " +

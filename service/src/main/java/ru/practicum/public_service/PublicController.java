@@ -7,6 +7,7 @@ import ru.practicum.dto.category.CatDto;
 import ru.practicum.dto.compilations.CompilationDto;
 import ru.practicum.dto.events.EventFullDto;
 import ru.practicum.dto.events.EventShortDto;
+import ru.practicum.dto.hit.HitAddDto;
 import ru.practicum.mappers.CatMapper;
 import ru.practicum.mappers.CompilationMapper;
 import ru.practicum.mappers.EventMapper;
@@ -93,17 +94,6 @@ public class PublicController {
         log.info("endpoint path: {}", request.getRequestURI());
 
 
-//        ResponseEntity<Object> addEndpointHit() {
-//
-//
-//            return eventClient.addEndpointHit(new HitAddDto(
-//
-//            ));
-//        }
-
-
-
-
 
 
 
@@ -140,6 +130,13 @@ public class PublicController {
         log.info("PublicController: Получен запрос на поиск полной информации о событии с Id = {}", eventId);
         log.info("client ip: {}", request.getRemoteAddr());
         log.info("endpoint path: {}", request.getRequestURI());
+
+        statisticClient.addEndpointHit(new HitAddDto(
+                "ewm-main-service",
+                request.getRequestURI(),
+                request.getRemoteAddr(),
+                LocalDateTime.now()
+        ));
 
 
 

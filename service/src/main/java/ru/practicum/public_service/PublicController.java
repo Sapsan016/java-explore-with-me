@@ -74,7 +74,7 @@ public class PublicController {
     }
 
     @GetMapping("/events")
-    public List<EventShortDto> searchEvents(@RequestParam("text") String text,
+    public List<EventShortDto> searchEvents(@RequestParam(defaultValue = "") String text,
                                             @RequestParam(defaultValue = "") Long[] categories,
                                             @RequestParam(defaultValue = "false") Boolean paid,
                                             @RequestParam(required = false) String rangeStart,
@@ -93,8 +93,12 @@ public class PublicController {
         log.info("client ip: {}", request.getRemoteAddr());
         log.info("endpoint path: {}", request.getRequestURI());
 
-
-
+        statisticClient.addEndpointHit(new HitAddDto(
+                "ewm-main-service",
+                request.getRequestURI(),
+                request.getRemoteAddr(),
+                LocalDateTime.now()
+        ));
 
 
         if (rangeStart == null && rangeEnd == null) {
@@ -137,11 +141,6 @@ public class PublicController {
                 request.getRemoteAddr(),
                 LocalDateTime.now()
         ));
-
-
-
-
-
         return EventMapper.toEventFullDto(publicService.getEventById(eventId));
     }
 }

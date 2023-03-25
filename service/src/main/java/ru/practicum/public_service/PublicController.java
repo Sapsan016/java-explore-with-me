@@ -2,6 +2,7 @@ package ru.practicum.public_service;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
+import ru.practicum.client.StatisticClient;
 import ru.practicum.dto.category.CatDto;
 import ru.practicum.dto.compilations.CompilationDto;
 import ru.practicum.dto.events.EventFullDto;
@@ -10,6 +11,7 @@ import ru.practicum.mappers.CatMapper;
 import ru.practicum.mappers.CompilationMapper;
 import ru.practicum.mappers.EventMapper;
 
+import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
@@ -21,11 +23,16 @@ import java.util.stream.Collectors;
 @Slf4j
 public class PublicController {
     private final PublicService publicService;
+
+    private final StatisticClient statisticClient;
+
+
     public static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
 
-    public PublicController(PublicService publicService) {
+    public PublicController(PublicService publicService, StatisticClient statisticClient) {
         this.publicService = publicService;
+        this.statisticClient = statisticClient;
     }
 
     @GetMapping("/categories")
@@ -74,12 +81,32 @@ public class PublicController {
                                             @RequestParam(defaultValue = "false") Boolean onlyAvailable,
                                             @RequestParam(defaultValue = "") String sort,
                                             @RequestParam(defaultValue = "0") Integer from,
-                                            @RequestParam(defaultValue = "10") Integer size) {
+                                            @RequestParam(defaultValue = "10") Integer size,
+                                            HttpServletRequest request) {
         log.info("PublicController: Получен запрос на поиск событий, имеющих в аннотации и подробном описании события" +
                         "текст {}, категории событий: {}, платные события: {}, события должны произойте не раньше " +
                         "чем: {}, и не позже чем: {} , только доступные события: {}, сортировка по {}, " +
                         "пропуская первых {}, размер списка = {}",
                 text, Arrays.toString(categories), paid, rangeStart, rangeEnd, onlyAvailable, sort, from, size);
+
+        log.info("client ip: {}", request.getRemoteAddr());
+        log.info("endpoint path: {}", request.getRequestURI());
+
+
+//        ResponseEntity<Object> addEndpointHit() {
+//
+//
+//            return eventClient.addEndpointHit(new HitAddDto(
+//
+//            ));
+//        }
+
+
+
+
+
+
+
         if (rangeStart == null && rangeEnd == null) {
             return publicService.searchEventsAfterStartRange(text, categories, paid, LocalDateTime.now(), onlyAvailable,
                             sort, from, size).stream()
@@ -109,8 +136,15 @@ public class PublicController {
     }
 
     @GetMapping("/events/{eventId}")
-    public EventFullDto getEventById(@PathVariable Long eventId) {
+    public EventFullDto getEventById(@PathVariable Long eventId,  HttpServletRequest request) {
         log.info("PublicController: Получен запрос на поиск полной информации о событии с Id = {}", eventId);
+        log.info("client ip: {}", request.getRemoteAddr());
+        log.info("endpoint path: {}", request.getRequestURI());
+
+
+
+
+
         return EventMapper.toEventFullDto(publicService.getEventById(eventId));
     }
 }

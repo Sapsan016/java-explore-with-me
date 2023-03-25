@@ -13,7 +13,7 @@ public class AfterValidator implements ConstraintValidator<After, LocalDateTime>
         boolean valid = true;
         if (value != null) {
             if (!value.isAfter(date.plusHours(2))) {
-                valid = false;
+                throw new TimeValidationException("The event date should be at least 2 hours after current time");
             }
         }
         return valid;

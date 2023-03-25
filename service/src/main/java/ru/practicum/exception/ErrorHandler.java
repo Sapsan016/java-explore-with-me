@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import ru.practicum.dto.events.validators.TimeValidationException;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -45,6 +46,13 @@ public class ErrorHandler {
     @ExceptionHandler
     @ResponseStatus(HttpStatus.CONFLICT)
     public ErrorResponse eventStateViolationException(final IllegalArgumentException e) {
+        return new ErrorResponse(e.getMessage(),
+                "BAD_REQUEST", "For the requested operation the conditions are not met.",
+                LocalDateTime.now().format(FORMATTER));
+    }
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public ErrorResponse timeViolationException(final TimeValidationException e) {
         return new ErrorResponse(e.getMessage(),
                 "BAD_REQUEST", "For the requested operation the conditions are not met.",
                 LocalDateTime.now().format(FORMATTER));

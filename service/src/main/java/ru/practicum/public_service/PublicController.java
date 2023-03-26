@@ -25,6 +25,7 @@ import java.util.stream.Collectors;
 public class PublicController {
     private final PublicService publicService;
 
+
     private final StatisticClient statisticClient;
 
 
@@ -93,13 +94,7 @@ public class PublicController {
         log.info("client ip: {}", request.getRemoteAddr());
         log.info("endpoint path: {}", request.getRequestURI());
 
-        statisticClient.addEndpointHit(new HitAddDto(
-                "ewm-main-service",
-                request.getRequestURI(),
-                request.getRemoteAddr(),
-                LocalDateTime.now()
-        ));
-
+        addEndpointHit(request);
 
         if (rangeStart == null && rangeEnd == null) {
             return publicService.searchEventsAfterStartRange(text, categories, paid, LocalDateTime.now(), onlyAvailable,
@@ -135,13 +130,21 @@ public class PublicController {
         log.info("client ip: {}", request.getRemoteAddr());
         log.info("endpoint path: {}", request.getRequestURI());
 
+        addEndpointHit(request);
+
+        return EventMapper.toEventFullDto(publicService.getEventById(eventId));
+    }
+
+
+    public void addEndpointHit(HttpServletRequest request) {
         statisticClient.addEndpointHit(new HitAddDto(
                 "ewm-main-service",
                 request.getRequestURI(),
                 request.getRemoteAddr(),
                 LocalDateTime.now()
         ));
-        return EventMapper.toEventFullDto(publicService.getEventById(eventId));
+
+
     }
 }
 

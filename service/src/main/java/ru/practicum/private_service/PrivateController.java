@@ -117,9 +117,18 @@ public class PrivateController {
     public LikeDto addLike(@PathVariable Long userId,
                            @PathVariable Long eventId,
                            @RequestParam(defaultValue = "true") Boolean like) {
-        log.info("PublicController: Получен запрос на добавление лайлка {} событию ID = {} " +
+        log.info("PublicController: Получен запрос на добавление лайка: {} событию ID = {} " +
                 "от пользователя ID = {}", like, eventId, userId);
         return LikeMapper.toDto(privateService.addLike(userId, eventId, like));
+    }
+
+    @PatchMapping("/{userId}/likes/{likeId}")
+    public LikeDto changeLike(@PathVariable Long userId,
+                           @PathVariable Long likeId,
+                           @RequestParam Boolean like) {
+        log.info("PublicController: Получен запрос на изменение лайка ID = {} " +
+                "от пользователя ID = {}", likeId, userId);
+        return LikeMapper.toDto(privateService.changeLike(userId, likeId, like));
     }
 
 }

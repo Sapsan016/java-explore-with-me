@@ -231,6 +231,18 @@ public class PrivateServiceImpl implements PrivateService {
         return likeToAdd;
     }
 
+    @Override
+    public Like changeLike(Long userId, Long likeId, Boolean like) {
+        Like likeToChange = likesRepository.findById(likeId).orElseThrow(() ->
+                new ObjectNotFoundException(String.format("Событие с ID=%s не найдено", likeId)));
+        if (!likeToChange.getUser().getId().equals(userId))
+            throw new IllegalArgumentException("Пользователь не ставил лайк этому событию");
+        likeToChange.setIsLike(like);
+        likesRepository.save(likeToChange);
+        log.info("Изменен лайк с ID = {}, пользователем с ID = {}", likeId, userId);
+        return likeToChange;
+    }
+
 
     private boolean checkRequestsCount(Event requestedEvent) {
         Integer requestCount = requestRepository.countParticipationRequestsByEventAndStatus(requestedEvent.getId(),

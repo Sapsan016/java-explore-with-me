@@ -33,4 +33,6 @@ public interface PrivateService {
     List<ParticipationRequest> getUserEventRequests(Long userId, Long eventId);
 
     Like addLike(Long userId, Long eventId, Boolean like);
+
+    Like changeLike(Long userId, Long likeId, Boolean like);
 }

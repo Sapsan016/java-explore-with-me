@@ -58,7 +58,7 @@ public class AdminServiceImpl implements AdminService {
     public Category createCategory(AddCatDto addCatDto) {
         Category category = CatMapper.toCat(addCatDto);
         categoryRepository.save(category);
-        log.info("Добавлена категория с Id = {}", category.getId());
+        log.info("Добавлена категория с ID = {}", category.getId());
         return category;
     }
 
@@ -68,7 +68,7 @@ public class AdminServiceImpl implements AdminService {
             throw new DataIntegrityViolationException("The category is not empty");
         Category catToRemove = findCategoryById(catId);
         categoryRepository.delete(catToRemove);
-        log.info("Удалена категория с Id = {}", catId);
+        log.info("Удалена категория с ID = {}", catId);
     }
 
     @Override
@@ -76,7 +76,7 @@ public class AdminServiceImpl implements AdminService {
         Category catToAlter = findCategoryById(catId);
         catToAlter.setName(category.getName());
         categoryRepository.save(catToAlter);
-        log.info("Изменена категория с Id = {}", catToAlter.getId());
+        log.info("Изменена категория с ID = {}", catToAlter.getId());
         return catToAlter;
     }
 
@@ -84,7 +84,7 @@ public class AdminServiceImpl implements AdminService {
     public User addUser(AddUserDto addUserDto) {
         User user = UserMapper.toUser(addUserDto);
         userRepository.save(user);
-        log.info("Добавлен пользователь с Id = {}", user.getId());
+        log.info("Добавлен пользователь с ID = {}", user.getId());
         return user;
     }
 
@@ -93,7 +93,7 @@ public class AdminServiceImpl implements AdminService {
     public void removeUser(Long userId) {
         User userToRemove = findUserById(userId);
         userRepository.delete(userToRemove);
-        log.info("Удален пользователь с Id = {}", userId);
+        log.info("Удален пользователь с ID = {}", userId);
     }
 
     @Override
@@ -102,7 +102,7 @@ public class AdminServiceImpl implements AdminService {
             log.info("Выполняется поиск всех пользователей пропуская первых {}, размер списка {}", from, size);
             return userRepository.getAllUsers(from, size);
         }
-        log.info("Выполняется поиск всех пользователей с id {} пропуская первых {}, размер списка {}",
+        log.info("Выполняется поиск всех пользователей с ID {} пропуская первых {}, размер списка {}",
                 Arrays.toString(ids), from, size);
         try {
             return Arrays.stream(ids).map(this::findUserById)
@@ -293,30 +293,30 @@ public class AdminServiceImpl implements AdminService {
     @Override
     public Category findCategoryById(Long catId) {
         return categoryRepository.findById(catId).orElseThrow(() ->
-                new ObjectNotFoundException(String.format("Category with id=%s was not found", catId)));
+                new ObjectNotFoundException(String.format("Категория с ID=%s не найдена", catId)));
     }
 
     @Override
     public User findUserById(Long userId) {
         return userRepository.findById(userId).orElseThrow(() ->
-                new ObjectNotFoundException(String.format("User with id=%s was not found", userId)));
+                new ObjectNotFoundException(String.format("Пользователь с ID=%s не найден", userId)));
     }
 
     public Compilation findCompilationById(Long compId) {
         return compilationRepository.findById(compId).orElseThrow(() ->
-                new ObjectNotFoundException(String.format("Compilation with id=%s was not found", compId)));
+                new ObjectNotFoundException(String.format("Подборка событий с ID=%s не найдена", compId)));
     }
 
 
     @Override
     public Event updateEvent(UpdateEventRequest updateEventDto, Long eventId) {
         Event eventToUpdate = eventRepository.findById(eventId).orElseThrow(() ->
-                new ObjectNotFoundException(String.format("Event with id=%s was not found", eventId)));
+                new ObjectNotFoundException(String.format("Событие с ID=%s не найдено", eventId)));
         if (eventToUpdate.getState().equals(EventState.CANCELED))
             throw new IllegalArgumentException("The event was cancelled");
         if (eventToUpdate.getEventDate().isBefore(LocalDateTime.now().plusHours(1)))
-            throw new IllegalArgumentException("The event starts in less than 1 hour from now " +
-                    "and could not be changed");
+            throw new IllegalArgumentException("Событие начинается менне чем через час " +
+                    "и не может быть изменено");
         eventToUpdate = checkUpdateEvent(eventToUpdate, updateEventDto);
         if (updateEventDto.getStateAction().equals(EventActionStates.PUBLISH_EVENT)) {
             eventToUpdate.setState(EventState.PUBLISHED);
@@ -332,7 +332,7 @@ public class AdminServiceImpl implements AdminService {
     @Override
     public Event checkUpdateEvent(Event eventToUpdate, UpdateEventRequest newEventDto) {
         if (eventToUpdate.getState().equals(EventState.PUBLISHED))
-            throw new IllegalArgumentException("The event was already published");
+            throw new IllegalArgumentException("Событие уже было опубликовано");
 
         if (newEventDto.getAnnotation() != null)
             eventToUpdate.setAnnotation(newEventDto.getAnnotation());
@@ -342,7 +342,7 @@ public class AdminServiceImpl implements AdminService {
             eventToUpdate.setDescription(newEventDto.getDescription());
         if (newEventDto.getLocation() != null) {
             locationRepository.save(newEventDto.getLocation());
-            log.info("Добавлена локация с Id = {}", newEventDto.getLocation().getId());
+            log.info("Добавлена локация с ID = {}", newEventDto.getLocation().getId());
             eventToUpdate.setLocation(newEventDto.getLocation());
         }
         if (newEventDto.getPaid() != null)
@@ -361,7 +361,7 @@ public class AdminServiceImpl implements AdminService {
         List<Long> events = newCompilationDto.getEvents();
         Compilation compilation = CompilationMapper.toCompilation(newCompilationDto);
         compilationRepository.save(compilation);
-        log.info("Добавлена подборка событий с Id = {}", compilation.getId());
+        log.info("Добавлена подборка событий с ID = {}", compilation.getId());
         if (events.size() > 0) {
             return addEventsToCompilation(compilation, events);
         }
@@ -373,7 +373,7 @@ public class AdminServiceImpl implements AdminService {
     public void removeCompilation(Long compId) {
         Compilation compToRemove = findCompilationById(compId);
         compilationRepository.delete(compToRemove);
-        log.info("Удалена категория с Id = {}", compId);
+        log.info("Удалена категория с ID = {}", compId);
     }
 
     @Override
@@ -386,7 +386,7 @@ public class AdminServiceImpl implements AdminService {
         if (newCompDto.getTitle() != null)
             compToAlter.setTitle(newCompDto.getTitle());
         compilationRepository.save(compToAlter);
-        log.info("Обновлена подборка событий с Id = {}", compToAlter.getId());
+        log.info("Обновлена подборка событий с ID = {}", compToAlter.getId());
         if (events.size() > 0) {
             compEventDAO.removeCompEvents(compId);
             return addEventsToCompilation(compToAlter, events);
@@ -402,7 +402,7 @@ public class AdminServiceImpl implements AdminService {
     public Compilation addEventsToCompilation(Compilation compilation, List<Long> events) {
         events.forEach(e -> compEventDAO.addNewCompEventPair(
                 compilation.getId(), e));
-        log.info("Добавлены события с Id = {} в подборку с Id = {}", events, compilation.getId());
+        log.info("Добавлены события с Id = {} в подборку с ID = {}", events, compilation.getId());
         List<EventShortDto> compilationEvents = events.stream()
                 .map(e -> eventRepository.findById(e).get())
                 .map(EventMapper::toEventShortDto).collect(Collectors.toList());

@@ -56,7 +56,7 @@ public class PublicServiceImpl implements PublicService {
 
     @Override
     public Category getCategoryById(Long catId) {
-        log.info("Выполняется поиск всех категории событий Id = {}", catId);
+        log.info("Выполняется поиск всех категории событий ID = {}", catId);
         return adminService.findCategoryById(catId);
     }
 
@@ -75,9 +75,9 @@ public class PublicServiceImpl implements PublicService {
 
     @Override
     public Compilation getCompilationById(Long compId) {
-        log.info("Выполняется поиск категории событий Id = {}", compId);
+        log.info("Выполняется поиск категории событий ID = {}", compId);
         Compilation compilation = compilationRepository.findById(compId).orElseThrow(() ->
-                new ObjectNotFoundException(String.format("Compilation with id=%s was not found", compId)));
+                new ObjectNotFoundException(String.format("Подборка событий с ID=%s не найдена", compId)));
         List<EventShortDto> compEvents = compEventDAO.getAllEventsId(compId)
                 .stream()
                 .map(id -> eventRepository.findById(id).get())
@@ -93,7 +93,7 @@ public class PublicServiceImpl implements PublicService {
                                                    String sort, Integer from, Integer size) {
         List<Event> foundEvents = eventRepository.searchEventsAfterStartRange(text.toLowerCase(), startRange);
 
-        return filterEvents(foundEvents, categories, paid,onlyAvailable,sort,from,size);
+        return filterEvents(foundEvents, categories, paid, onlyAvailable, sort, from, size);
     }
 
     @Override
@@ -101,7 +101,7 @@ public class PublicServiceImpl implements PublicService {
                                                   Boolean onlyAvailable, String sort, Integer from, Integer size) {
         List<Event> foundEvents = eventRepository.searchEventsBeforeEndRange(text.toLowerCase(), endRange);
 
-        return filterEvents(foundEvents, categories, paid,onlyAvailable,sort,from,size);
+        return filterEvents(foundEvents, categories, paid, onlyAvailable, sort, from, size);
     }
 
     @Override
@@ -111,14 +111,14 @@ public class PublicServiceImpl implements PublicService {
                                                         Integer size) {
         List<Event> foundEvents = eventRepository.searchWithStartEnd(text.toLowerCase(), startRange, endRange);
 
-        return filterEvents(foundEvents, categories, paid,onlyAvailable,sort,from,size);
+        return filterEvents(foundEvents, categories, paid, onlyAvailable, sort, from, size);
     }
 
     @Override
     public Event getEventById(Long eventId) {
         log.info("Выполняется поиск события Id = {}", eventId);
         return eventRepository.findById(eventId).orElseThrow(() ->
-                new ObjectNotFoundException(String.format("Compilation with id=%s was not found", eventId)));
+                new ObjectNotFoundException(String.format("Подборка событий ID=%s не найдена", eventId)));
     }
 
     private List<Event> filterEvents(List<Event> foundEvents, Long[] categories, Boolean paid, Boolean onlyAvailable,
@@ -168,6 +168,5 @@ public class PublicServiceImpl implements PublicService {
         }
         return compilations;
     }
-
 
 }

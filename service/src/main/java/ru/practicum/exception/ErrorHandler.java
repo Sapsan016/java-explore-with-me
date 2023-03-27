@@ -20,21 +20,21 @@ public class ErrorHandler {
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ErrorResponse objectNotFoundExceptionResponse(final ObjectNotFoundException e) {
         return new ErrorResponse(e.getMessage(),
-                "NOT_FOUND", "The required object was not found.", LocalDateTime.now().format(FORMATTER));
+                "NOT_FOUND", "Запрашиваемый объект не найден.", LocalDateTime.now().format(FORMATTER));
     }
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse badRequest(final MethodArgumentNotValidException e) {
         return new ErrorResponse(e.getMessage(),
-                "BAD_REQUEST", "Incorrectly made request.", LocalDateTime.now().format(FORMATTER));
+                "BAD_REQUEST", "Неверный запрос.", LocalDateTime.now().format(FORMATTER));
     }
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse badArgumentRequest(final MethodArgumentTypeMismatchException e) {
         return new ErrorResponse(e.getMessage(),
-                "BAD_REQUEST", "Incorrectly made request.", LocalDateTime.now().format(FORMATTER));
+                "BAD_REQUEST", "Неверный запрос.", LocalDateTime.now().format(FORMATTER));
     }
 
 
@@ -42,7 +42,7 @@ public class ErrorHandler {
     @ResponseStatus(HttpStatus.CONFLICT)
     public ErrorResponse dataViolationException(final DataIntegrityViolationException e) {
         return new ErrorResponse(e.getMessage(),
-                "CONFLICT", "Integrity constraint has been violated.",
+                "CONFLICT", "Нарушение целостности данных",
                 LocalDateTime.now().format(FORMATTER));
     }
 
@@ -50,7 +50,7 @@ public class ErrorHandler {
     @ResponseStatus(HttpStatus.CONFLICT)
     public ErrorResponse eventStateViolationException(final IllegalArgumentException e) {
         return new ErrorResponse(e.getMessage(),
-                "CONFLICT", "For the requested operation the conditions are not met.",
+                "CONFLICT", "Не соблюдены условия для запрошенной операции.",
                 LocalDateTime.now().format(FORMATTER));
     }
 
@@ -58,7 +58,7 @@ public class ErrorHandler {
     @ResponseStatus(HttpStatus.CONFLICT)
     public ErrorResponse timeViolationException(final TimeValidationException e) {
         return new ErrorResponse(e.getMessage(),
-                "BAD_REQUEST", "For the requested operation the conditions are not met.",
+                "BAD_REQUEST", "Не соблюдены условия для запрошенной операции.",
                 LocalDateTime.now().format(FORMATTER));
     }
 

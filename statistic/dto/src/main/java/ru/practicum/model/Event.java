@@ -67,23 +67,11 @@ public class Event {
 
     @Override
     public String toString() {
-        return "Event{" +
-                "id=" + id +
-                ", annotation='" + annotation + '\'' +
-                ", category=" + category +
-                ", confirmedRequests=" + confirmedRequests +
-                ", createdOn=" + createdOn +
-                ", description='" + description + '\'' +
-                ", eventDate=" + eventDate +
-                ", user=" + user +
-                ", location=" + location +
-                ", paid=" + paid +
-                ", participantLimit=" + participantLimit +
-                ", publishedOn=" + publishedOn +
-                ", requestModeration=" + requestModeration +
-                ", state=" + state +
-                ", title='" + title + '\'' +
-                ", views=" + views +
-                '}';
+        return String.format("Event{ " +
+                        "ID=%s, annotation='%s, category=%s, confirmedRequests=%s, createdOn=%s, description='%s," +
+                        "eventDate=%s, user=%s, location=%s, paid=%s, participantLimit=%s, publishedOn=%s, " +
+                        "requestModeration=%s, state=%s, title='%s, views=%s",
+                id, annotation, category, confirmedRequests, createdOn, description, eventDate, user, location,
+                paid, participantLimit, publishedOn, requestModeration, state, title, views);
     }
 }

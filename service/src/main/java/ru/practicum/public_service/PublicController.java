@@ -40,7 +40,7 @@ public class PublicController {
     @GetMapping("/categories")
     public List<CatDto> getStats(@RequestParam(defaultValue = "0") Integer from,
                                  @RequestParam(defaultValue = "10") Integer size) {
-        log.info("PublicController: Получен запрос на поиск категорий событий пропуская первые {}, размер списка = {}",
+        log.info("PublicController: Получен запрос на поиск категорий событий пропуская первые: {}, размер списка = {}",
                 from, size);
 
         return publicService.getCategories(from, size)
@@ -51,7 +51,7 @@ public class PublicController {
 
     @GetMapping("/categories/{catId}")
     public CatDto getCategoryById(@PathVariable Long catId) {
-        log.info("PublicController: Получен запрос на поиск категории с Id = {}", catId);
+        log.info("PublicController: Получен запрос на поиск категории с ID = {}", catId);
         return CatMapper.toCatDto(publicService.getCategoryById(catId));
     }
 
@@ -59,8 +59,8 @@ public class PublicController {
     public List<CompilationDto> getCompilations(@RequestParam(defaultValue = "false") Boolean pinned,
                                                 @RequestParam(defaultValue = "0") Integer from,
                                                 @RequestParam(defaultValue = "10") Integer size) {
-        log.info("PublicController: Получен запрос на поиск подборок событий, закрепленных {}, " +
-                "пропуская первые {}, размер списка = {}", pinned, from, size);
+        log.info("PublicController: Получен запрос на поиск подборок событий, закрепленных: {}, " +
+                "пропуская первые: {}, размер списка = {}", pinned, from, size);
 
         return publicService.getCompilations(pinned, from, size)
                 .stream()
@@ -70,7 +70,7 @@ public class PublicController {
 
     @GetMapping("/compilations/{compId}")
     public CompilationDto getCompilationById(@PathVariable Long compId) {
-        log.info("PublicController: Получен запрос на поиск подборки событий с Id = {}", compId);
+        log.info("PublicController: Получен запрос на поиск подборки событий с ID = {}", compId);
         return CompilationMapper.toDto(publicService.getCompilationById(compId));
     }
 
@@ -86,7 +86,7 @@ public class PublicController {
                                             @RequestParam(defaultValue = "10") Integer size,
                                             HttpServletRequest request) {
         log.info("PublicController: Получен запрос на поиск событий, имеющих в аннотации и подробном описании события" +
-                        "текст {}, категории событий: {}, платные события: {}, события должны произойте не раньше " +
+                        "текст: {}, категории событий: {}, платные события: {}, события должны произойте не раньше " +
                         "чем: {}, и не позже чем: {} , только доступные события: {}, сортировка по {}, " +
                         "пропуская первых {}, размер списка = {}",
                 text, Arrays.toString(categories), paid, rangeStart, rangeEnd, onlyAvailable, sort, from, size);
@@ -126,7 +126,7 @@ public class PublicController {
 
     @GetMapping("/events/{eventId}")
     public EventFullDto getEventById(@PathVariable Long eventId, HttpServletRequest request) {
-        log.info("PublicController: Получен запрос на поиск полной информации о событии с Id = {}", eventId);
+        log.info("PublicController: Получен запрос на поиск полной информации о событии с ID = {}", eventId);
         log.info("client ip: {}", request.getRemoteAddr());
         log.info("endpoint path: {}", request.getRequestURI());
 
@@ -143,7 +143,6 @@ public class PublicController {
                 request.getRemoteAddr(),
                 LocalDateTime.now()
         ));
-
 
     }
 }

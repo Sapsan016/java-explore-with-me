@@ -31,7 +31,7 @@ public class PrivateController {
     @PostMapping("/{userId}/events")
     @ResponseStatus(HttpStatus.CREATED)
     public EventFullDto addEvent(@RequestBody @Valid NewEventDto newEventDto, @PathVariable Long userId) {
-        log.info("PublicController: Получен запрос на добавление события {} от пользователя Id = {}",
+        log.info("PublicController: Получен запрос на добавление события {} от пользователя ID = {}",
                 newEventDto.toString(), userId);
         return EventMapper.toEventFullDto(privateService.addEvent(newEventDto, userId));
     }
@@ -40,7 +40,7 @@ public class PrivateController {
     public List<EventShortDto> getEvents(@PathVariable Long userId,
                                          @RequestParam(defaultValue = "0") Integer from,
                                          @RequestParam(defaultValue = "10") Integer size) {
-        log.info("PublicController: Получен запрос на поиск событий, добавленных пользователем с Id = {}," +
+        log.info("PublicController: Получен запрос на поиск событий, добавленных пользователем с ID = {}," +
                 "пропуская первых {}, размер списка = {}", userId, from, size);
         return privateService.getEventsByUserId(userId, from, size)
                 .stream()
@@ -50,7 +50,7 @@ public class PrivateController {
 
     @GetMapping("/{userId}/events/{eventId}")
     public EventFullDto getFullEvent(@PathVariable Long userId, @PathVariable Long eventId) {
-        log.info("PublicController: Получен запрос на поиск полной информации о событии c Id = {} " +
+        log.info("PublicController: Получен запрос на поиск полной информации о событии c ID = {} " +
                 "от пользователя Id = {}", eventId, userId);
         return EventMapper.toEventFullDto(privateService.getFullEvent(userId, eventId));
     }
@@ -58,7 +58,7 @@ public class PrivateController {
     @PatchMapping("/{userId}/events/{eventId}")
     public EventFullDto updateEvent(@RequestBody @Valid UpdateEventRequest updateEventDto, @PathVariable Long userId,
                                     @PathVariable Long eventId) {
-        log.info("PublicController: Получен запрос на обновления события {} от пользователя Id = {}",
+        log.info("PublicController: Получен запрос на обновления события {} от пользователя ID = {}",
                 updateEventDto, userId);
         return EventMapper.toEventFullDto(privateService.updateEvent(updateEventDto, userId, eventId));
     }
@@ -67,14 +67,14 @@ public class PrivateController {
     @ResponseStatus(HttpStatus.CREATED)
     public ParticipationRequestDto addRequest(@PathVariable Long userId,
                                               @RequestParam Long eventId) {
-        log.info("PublicController: Получен новый запрос на участие в событии Id = {} от пользователя Id = {}",
+        log.info("PublicController: Получен новый запрос на участие в событии ID = {} от пользователя ID = {}",
                 eventId, userId);
         return RequestMapper.toDto(privateService.addRequest(userId, eventId));
     }
 
     @GetMapping("/{userId}/requests")
     public List<ParticipationRequestDto> getUserRequest(@PathVariable Long userId) {
-        log.info("PublicController: Получен поиск запросов, добавленных пользователем с Id = {}", userId);
+        log.info("PublicController: Получен поиск запросов, добавленных пользователем с ID = {}", userId);
         return privateService.getUserRequests(userId)
                 .stream()
                 .map(RequestMapper::toDto)
@@ -84,7 +84,7 @@ public class PrivateController {
     @PatchMapping("/{userId}/requests/{requestId}/cancel")
     public ParticipationRequestDto cancelRequest(@PathVariable Long userId,
                                                  @PathVariable Long requestId) {
-        log.info("PublicController: Получено удаление поиск запроса с Id = {}, от пользователя с Id = {}",
+        log.info("PublicController: Получено удаление поиск запроса с ID = {}, от пользователя с ID = {}",
                 requestId, userId);
         return RequestMapper.toDto(privateService.cancelRequest(userId, requestId));
     }
@@ -93,7 +93,7 @@ public class PrivateController {
     public EventRequestStatusUpdateResult updateRequest(@RequestBody EventRequestStatusUpdateRequest updateRequest,
                                                         @PathVariable Long userId,
                                                         @PathVariable Long eventId) {
-        log.info("PublicController: Получено обновление статуса запросов {} на участие в событии с Id = {}, " +
+        log.info("PublicController: Получено обновление статуса запросов {} на участие в событии с ID = {}, " +
                 "добавленном пользователем с Id = {}", updateRequest, eventId, userId);
         return privateService.updateRequest(updateRequest, userId, eventId);
 
@@ -103,7 +103,7 @@ public class PrivateController {
     public List<ParticipationRequestDto> getUserEventRequest(@PathVariable Long userId,
                                                              @PathVariable Long eventId) {
         log.info("PublicController: Получен поиск информации о запросах на участие " +
-                "в событии с Id = {}, добавленном пользователем Id = {}", eventId, userId);
+                "в событии с ID = {}, добавленном пользователем ID = {}", eventId, userId);
         return privateService.getUserEventRequests(userId, eventId)
                 .stream()
                 .map(RequestMapper::toDto)

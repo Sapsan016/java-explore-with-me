@@ -67,7 +67,7 @@ public class AdminController {
     public List<UserDto> getUsers(@RequestParam(required = false, defaultValue = "") Long[] ids,
                                   @RequestParam(defaultValue = "0") Integer from,
                                   @RequestParam(defaultValue = "10") Integer size) {
-        log.info("AdminController: Получен запрос на поиск пользователей с номерами Id {}, " +
+        log.info("AdminController: Получен запрос на поиск пользователей с номерами ID: {}, " +
                 "пропуская первых {}, размер списка = {}", Arrays.toString(ids), from, size);
 
         return adminService.getUsers(ids, from, size)
@@ -86,7 +86,7 @@ public class AdminController {
     @PatchMapping("/events/{eventId}")
     public EventFullDto updateEvent(@RequestBody @Valid UpdateEventRequest updateEventDto,
                                     @PathVariable Long eventId) {
-        log.info("AdminController: Получен запрос {} на обновления события Id = {}", updateEventDto, eventId);
+        log.info("AdminController: Получен запрос {} на обновления события ID = {}", updateEventDto, eventId);
         return EventMapper.toEventFullDto(adminService.updateEvent(updateEventDto, eventId));
     }
 
@@ -120,7 +120,7 @@ public class AdminController {
                                         @RequestParam(required = false) String rangeEnd,
                                         @RequestParam(defaultValue = "0") Integer from,
                                         @RequestParam(defaultValue = "10") Integer size) {
-        log.info("AdminController: Получен запрос на поиск событий, добавленных пользователями с номерами Id {}, " +
+        log.info("AdminController: Получен запрос на поиск событий, добавленных пользователями с номерами ID: {}, " +
                         "состояния событий: {}, категории событий: {}, события должны произойте не раньше чем: {}, " +
                         " и не позже чем: {} пропуская первых {}, размер списка = {}",
                 Arrays.toString(users), Arrays.toString(states), Arrays.toString(categories), rangeStart, rangeEnd,

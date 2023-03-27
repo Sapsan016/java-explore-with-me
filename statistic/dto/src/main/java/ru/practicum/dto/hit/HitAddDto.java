@@ -1,4 +1,4 @@
-package ru.practicum.dto;
+package ru.practicum.dto.hit;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AccessLevel;
@@ -26,4 +26,5 @@ public class HitAddDto {
     @NotNull
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
     LocalDateTime timestamp;
+
 }

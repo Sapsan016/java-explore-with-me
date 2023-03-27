@@ -4,9 +4,9 @@ import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import ru.practicum.dto.HitAddDto;
-import ru.practicum.dto.HitDto;
-import ru.practicum.dto.HitMapper;
+import ru.practicum.dto.hit.HitAddDto;
+import ru.practicum.dto.hit.HitDto;
+import ru.practicum.dto.hit.HitMapper;
 import ru.practicum.exception.HitsNotFoundException;
 import ru.practicum.model.EndpointHit;
 
@@ -29,7 +29,7 @@ public class StatServiceImpl implements StatService {
     public EndpointHit addHit(HitAddDto hitAddDto) {
         EndpointHit hit = HitMapper.toHit(hitAddDto);
         statRepository.save(hit);
-        log.info("Добавлена информация о запросе с Id = {}", hit.getId());
+        log.info("Добавлена информация о запросе с ID = {}", hit.getId());
         return hit;
     }
 

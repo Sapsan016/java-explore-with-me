@@ -1,11 +1,12 @@
 package ru.practicum.server;
 
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.dto.HitAddDto;
-import ru.practicum.dto.HitDto;
-import ru.practicum.dto.HitMapper;
+import ru.practicum.dto.hit.HitAddDto;
+import ru.practicum.dto.hit.HitDto;
+import ru.practicum.dto.hit.HitMapper;
 
 import javax.validation.Valid;
 import java.time.LocalDateTime;
@@ -16,6 +17,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
+@Slf4j
+
 public class StatController {
 
     private final StatService statService;
@@ -29,6 +32,7 @@ public class StatController {
     @PostMapping(path = "/hit")                                        //Сохранение информации о запросе на эндпойнт
     @ResponseStatus(HttpStatus.CREATED)
     public HitDto addEndpointHit(@RequestBody @Valid HitAddDto hitAddDto) {
+        log.info("Получена информация: {} о запросе к эндпойнту", hitAddDto);
         return HitMapper.toHitDto(statService.addHit(hitAddDto));
     }
 

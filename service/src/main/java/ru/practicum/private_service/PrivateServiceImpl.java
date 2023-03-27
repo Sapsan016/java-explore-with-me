@@ -19,6 +19,7 @@ import ru.practicum.mappers.EventMapper;
 import ru.practicum.mappers.RequestMapper;
 import ru.practicum.model.*;
 import ru.practicum.repositories.EventRepository;
+import ru.practicum.repositories.LikesRepository;
 import ru.practicum.repositories.LocationRepository;
 import ru.practicum.repositories.RequestRepository;
 
@@ -36,15 +37,16 @@ public class PrivateServiceImpl implements PrivateService {
     EventRepository eventRepository;
     LocationRepository locationRepository;
     AdminService adminService;
-
     RequestRepository requestRepository;
+    LikesRepository likesRepository;
 
     public PrivateServiceImpl(EventRepository eventRepository, LocationRepository locationRepository,
-                              AdminService adminService, RequestRepository requestRepository) {
+                              AdminService adminService, RequestRepository requestRepository, LikesRepository likesRepository) {
         this.eventRepository = eventRepository;
         this.locationRepository = locationRepository;
         this.adminService = adminService;
         this.requestRepository = requestRepository;
+        this.likesRepository = likesRepository;
     }
 
     @Override
@@ -208,6 +210,25 @@ public class PrivateServiceImpl implements PrivateService {
     public List<ParticipationRequest> getUserEventRequests(Long userId, Long eventId) {
         log.info("Выполняется поиск запросов, на участие в событии с Id = {} ", eventId);
         return requestRepository.findParticipationRequestsByEvent(eventId);
+    }
+
+    @Override
+    public Like addLike(Long userId, Long eventId, Boolean like) {
+        Event eventToLike = eventRepository.findById(eventId).orElseThrow(() ->
+                new ObjectNotFoundException(String.format("Событие с ID=%s не найдено", eventId)));
+        if (!eventToLike.getState().equals(EventState.PUBLISHED))
+            throw new IllegalArgumentException("Событие не опубликовано.");
+        User userLike = adminService.findUserById(userId);
+        if (likesRepository.findByEventAndUser(eventToLike, userLike) != null)
+            throw new IllegalArgumentException("Пользователь уже поставил лайк этому событию");
+
+        Like likeToAdd = new Like(null, eventToLike, userLike, like);
+
+        likesRepository.save(likeToAdd);
+        log.info("Добавлен лайк с ID = {}, пользователем с ID = {} событию с ID = {}", likeToAdd.getId(),
+                userId, eventId);
+
+        return likeToAdd;
     }
 
 

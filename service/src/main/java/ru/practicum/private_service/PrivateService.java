@@ -5,6 +5,7 @@ import ru.practicum.dto.events.requests.EventRequestStatusUpdateRequest;
 import ru.practicum.dto.events.requests.EventRequestStatusUpdateResult;
 import ru.practicum.dto.events.requests.UpdateEventRequest;
 import ru.practicum.model.Event;
+import ru.practicum.model.Like;
 import ru.practicum.model.ParticipationRequest;
 
 import java.util.List;
@@ -30,4 +31,6 @@ public interface PrivateService {
                                                  Long userId, Long eventId);
 
     List<ParticipationRequest> getUserEventRequests(Long userId, Long eventId);
+
+    Like addLike(Long userId, Long eventId, Boolean like);
 }

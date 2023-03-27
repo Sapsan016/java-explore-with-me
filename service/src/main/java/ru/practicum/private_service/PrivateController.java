@@ -6,11 +6,13 @@ import org.springframework.web.bind.annotation.*;
 import ru.practicum.dto.events.EventFullDto;
 import ru.practicum.dto.events.EventShortDto;
 import ru.practicum.dto.events.NewEventDto;
+import ru.practicum.dto.events.likes.LikeDto;
 import ru.practicum.dto.events.requests.EventRequestStatusUpdateRequest;
 import ru.practicum.dto.events.requests.EventRequestStatusUpdateResult;
 import ru.practicum.dto.events.requests.ParticipationRequestDto;
 import ru.practicum.dto.events.requests.UpdateEventRequest;
 import ru.practicum.mappers.EventMapper;
+import ru.practicum.mappers.LikeMapper;
 import ru.practicum.mappers.RequestMapper;
 
 import javax.validation.Valid;
@@ -109,4 +111,15 @@ public class PrivateController {
                 .map(RequestMapper::toDto)
                 .collect(Collectors.toList());
     }
+
+    @PostMapping("/{userId}/events/{eventId}")
+    @ResponseStatus(HttpStatus.CREATED)
+    public LikeDto addLike(@PathVariable Long userId,
+                           @PathVariable Long eventId,
+                           @RequestParam(defaultValue = "true") Boolean like) {
+        log.info("PublicController: Получен запрос на добавление лайлка {} событию ID = {} " +
+                "от пользователя ID = {}", like, eventId, userId);
+        return LikeMapper.toDto(privateService.addLike(userId, eventId, like));
+    }
+
 }

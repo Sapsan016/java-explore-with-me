@@ -243,6 +243,16 @@ public class PrivateServiceImpl implements PrivateService {
         return likeToChange;
     }
 
+    @Override
+    public List<Event> getLikedEventsByUserId(Long userId, Integer from, Integer size) {
+        User userLiked = adminService.findUserById(userId);
+        List<Like> likes = likesRepository.findByUserAndIsLikeIsTrue(userLiked);
+        List<Long> eventIds = likes.stream().map(like -> like.getEvent().getId()).collect(Collectors.toList());
+        log.info("Выполняется поиск событий c ID: {} понравившихся пользователю с ID = {}, " +
+                "пропуская первые: {} событий, размер списка:{}", eventIds, userId, from, size);
+        return eventRepository.findAllById(eventIds).stream().skip(from).limit(size).collect(Collectors.toList());
+    }
+
 
     private boolean checkRequestsCount(Event requestedEvent) {
         Integer requestCount = requestRepository.countParticipationRequestsByEventAndStatus(requestedEvent.getId(),

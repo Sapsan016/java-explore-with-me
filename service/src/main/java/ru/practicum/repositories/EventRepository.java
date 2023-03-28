@@ -28,6 +28,7 @@ public interface EventRepository extends JpaRepository<Event, Long> {
     @Query(value = "SELECT * FROM events offset ? LIMIT ?", nativeQuery = true)
     List<Event> getEventsByFromAndSize(Integer from, Integer size);
 
+
     @Query("select e from Event e " +
             "where e.state='PUBLISHED' and (lower(e.annotation) like lower(concat('%', ?1, '%')) " +
             " or lower(e.description) like lower(concat('%', ?1, '%'))) and e.eventDate>= ?2 and e.eventDate < ?3")

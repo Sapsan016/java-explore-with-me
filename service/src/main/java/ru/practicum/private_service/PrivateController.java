@@ -131,4 +131,18 @@ public class PrivateController {
         return LikeMapper.toDto(privateService.changeLike(userId, likeId, like));
     }
 
+    @GetMapping("/{userId}/likes")
+    public List<EventShortDto> getLikedEvents(@PathVariable Long userId,
+                                              @RequestParam(defaultValue = "0") Integer from,
+                                              @RequestParam(defaultValue = "10") Integer size) {
+        log.info("PublicController: Получен запрос от пользователя ID = {} на получения списка понравившехся событий," +
+                "пропуская первых: {} событий, размер списка: {}", userId, from, size);
+        return privateService.getLikedEventsByUserId(userId, from, size)
+                .stream()
+                .map(EventMapper::toEventShortDto)
+                .collect(Collectors.toList());
+
+    }
+
+
 }

@@ -35,4 +35,6 @@ public interface PrivateService {
     Like addLike(Long userId, Long eventId, Boolean like);
 
     Like changeLike(Long userId, Long likeId, Boolean like);
+
+    List<Event> getLikedEventsByUserId(Long userId, Integer from, Integer size);
 }

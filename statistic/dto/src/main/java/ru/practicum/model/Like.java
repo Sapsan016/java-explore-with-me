@@ -28,4 +28,14 @@ public class Like {
 
     @Column(name = "is_like")
     Boolean isLike;
+
+    @Override
+    public String toString() {
+        return "Like{" +
+                "id=" + id +
+                ", event=" + event +
+                ", user=" + user +
+                ", isLike=" + isLike +
+                '}';
+    }
 }

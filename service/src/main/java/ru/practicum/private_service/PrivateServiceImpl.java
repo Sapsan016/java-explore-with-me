@@ -223,11 +223,15 @@ public class PrivateServiceImpl implements PrivateService {
             throw new IllegalArgumentException("Пользователь уже поставил лайк этому событию");
 
         Like likeToAdd = new Like(null, eventToLike, userLike, like);
-
         likesRepository.save(likeToAdd);
         log.info("Добавлен лайк с ID = {}, пользователем с ID = {} событию с ID = {}", likeToAdd.getId(),
                 userId, eventId);
+        Integer rate = likesRepository.countByIsLikeIsTrueAndEvent(eventToLike) -
+                likesRepository.countByIsLikeIsFalseAndEvent(eventToLike);
 
+       eventToLike.setRate(rate);
+       eventRepository.save(eventToLike);
+        log.info("У события с ID = {} установлен рейтинг:{}", eventId, rate);
         return likeToAdd;
     }
 

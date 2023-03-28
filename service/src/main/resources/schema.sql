@@ -40,6 +40,7 @@ CREATE TABLE IF NOT EXISTS events
     state              VARCHAR(20)                             NOT NULL,
     title              VARCHAR(120)                            NOT NULL,
     views              BIGINT,
+    rate               BIGINT,
     CONSTRAINT pk_events PRIMARY KEY (event_id),
     FOREIGN KEY (category_id)
         REFERENCES categories (category_id) ON DELETE CASCADE,

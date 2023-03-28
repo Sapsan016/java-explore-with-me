@@ -64,6 +64,8 @@ public class Event {
 
     Integer views;
 
+    Integer rate;
+
 
     @Override
     public String toString() {

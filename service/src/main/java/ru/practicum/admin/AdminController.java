@@ -120,37 +120,37 @@ public class AdminController {
                                         @RequestParam(required = false) String rangeStart,
                                         @RequestParam(required = false) String rangeEnd,
                                         @RequestParam(defaultValue = "0") Integer from,
-                                        @RequestParam(defaultValue = "10") Integer size) {
+                                        @RequestParam(defaultValue = "10") Integer size,
+                                        @RequestParam(defaultValue = "NO") String sort) {
         log.info("AdminController: Получен запрос на поиск событий, добавленных пользователями с номерами ID: {}, " +
                         "состояния событий: {}, категории событий: {}, события должны произойте не раньше чем: {}, " +
-                        " и не позже чем: {} пропуская первых {}, размер списка = {}",
+                        " и не позже чем: {} пропуская первых {}, размер списка = {}, сортировка по рейтингу: {}",
                 Arrays.toString(users), Arrays.toString(states), Arrays.toString(categories), rangeStart, rangeEnd,
-                from, size);
+                from, size, sort);
         if (rangeStart == null && rangeEnd == null) {
-            return adminService.getEventsWithoutTime(users, states, categories, from, size).stream()
+            return adminService.getEventsWithoutTime(users, states, categories, from, size, sort).stream()
                     .map(EventMapper::toEventFullDto)
                     .collect(Collectors.toList());
         }
 
         if (rangeStart == null) {
             return adminService.getEventsWithEndTimeParamTime(users, states, categories,
-                            LocalDateTime.parse(rangeEnd, FORMATTER), from, size).stream()
+                            LocalDateTime.parse(rangeEnd, FORMATTER), from, size, sort).stream()
                     .map(EventMapper::toEventFullDto)
                     .collect(Collectors.toList());
         }
         if (rangeEnd == null) {
             return adminService.getEventsWithStartTimeParamTime(users, states, categories,
-                            LocalDateTime.parse(rangeStart, FORMATTER), from, size).stream()
+                            LocalDateTime.parse(rangeStart, FORMATTER), from, size, sort).stream()
                     .map(EventMapper::toEventFullDto)
                     .collect(Collectors.toList());
         }
 
         return adminService.getEventsWithTime(users, states, categories, LocalDateTime.parse(rangeStart, FORMATTER),
-                        LocalDateTime.parse(rangeEnd, FORMATTER), from, size)
+                        LocalDateTime.parse(rangeEnd, FORMATTER), from, size, sort)
                 .stream()
                 .map(EventMapper::toEventFullDto)
                 .collect(Collectors.toList());
     }
-
 
 }

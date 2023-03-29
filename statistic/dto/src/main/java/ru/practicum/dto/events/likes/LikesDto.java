@@ -20,6 +20,6 @@ public class LikesDto {
 
     UserShortDto user;
 
-    Boolean Like;
+    Boolean like;
 
 }

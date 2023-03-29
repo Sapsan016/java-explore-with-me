@@ -262,8 +262,6 @@ public class PrivateServiceImpl implements PrivateService {
                 userId, likeToRemove.getEvent().getId());
         calculateAndSetEventRate(likeToRemove.getEvent());
         calculateAndSetUserRate(likeToRemove.getEvent().getUser());
-
-
     }
 
     private void calculateAndSetEventRate(Event event) {
@@ -273,30 +271,19 @@ public class PrivateServiceImpl implements PrivateService {
         eventRepository.save(event);
         log.info("Для события с ID = {} установлен рейтинг:{}", event.getId(), rate);
     }
+
     private void calculateAndSetUserRate(User user) {
         List<Event> userEvents = getEventsByUserId(user.getId(), 0, Integer.MAX_VALUE);
         Double averageUserRate = 0.0;
         for (Event event : userEvents) {
             averageUserRate += event.getRate();
         }
-        System.out.println("AVERAGE USER RATE : " + averageUserRate);
-        System.out.println("EVENTS : " + userEvents.size());
-
 
         averageUserRate = averageUserRate / userEvents.size();
-
-
-
-
-        System.out.println("AVERAGE RATE : " + averageUserRate);
         user.setUserRate(averageUserRate);
         log.info("Для пользователя с ID = {} установлен рейтинг:{}", user.getId(), averageUserRate);
         userRepository.save(user);
     }
-
-
-
-
 
     private boolean checkRequestsCount(Event requestedEvent) {
         Integer requestCount = requestRepository.countParticipationRequestsByEventAndStatus(requestedEvent.getId(),

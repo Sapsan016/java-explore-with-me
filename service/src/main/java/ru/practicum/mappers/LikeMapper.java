@@ -12,7 +12,6 @@ public class LikeMapper {
                 EventMapper.toEventShortDto(like.getEvent()),
                 UserMapper.toUserShortDto(like.getUser()),
                 like.getIsLike()
-
         );
     }
 

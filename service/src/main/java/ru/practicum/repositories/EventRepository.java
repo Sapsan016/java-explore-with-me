@@ -9,7 +9,10 @@ import java.util.List;
 
 public interface EventRepository extends JpaRepository<Event, Long> {
     @Query(value = "SELECT * FROM events WHERE initiator_id = ? offset ? LIMIT ?", nativeQuery = true)
-    List<Event> getAllEventsByUserId(Long userid, Integer from, Integer size);
+    List<Event> getAllEventsByUserIdAndLimit(Long userid, Integer from, Integer size);
+
+    @Query(value = "SELECT * FROM events WHERE initiator_id = ?", nativeQuery = true)
+    List<Event> getAllEventsByUserId(Long userid);
 
     List<Event> findEventByState(String state);
 
@@ -27,7 +30,6 @@ public interface EventRepository extends JpaRepository<Event, Long> {
 
     @Query(value = "SELECT * FROM events offset ? LIMIT ?", nativeQuery = true)
     List<Event> getEventsByFromAndSize(Integer from, Integer size);
-
 
     @Query("select e from Event e " +
             "where e.state='PUBLISHED' and (lower(e.annotation) like lower(concat('%', ?1, '%')) " +

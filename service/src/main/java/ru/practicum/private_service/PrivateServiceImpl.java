@@ -67,7 +67,7 @@ public class PrivateServiceImpl implements PrivateService {
     public List<Event> getEventsByUserId(Long userId, Integer from, Integer size) {
         log.info("Выполняется поиск всех событий, добавленных пользователем с ID = {} пропуская первых {}, " +
                 "размер списка {}", userId, from, size);
-        return eventRepository.getAllEventsByUserId(userId, from, size);
+        return eventRepository.getAllEventsByUserIdAndLimit(userId, from, size);
     }
 
     @Override
@@ -245,13 +245,30 @@ public class PrivateServiceImpl implements PrivateService {
 
 
     @Override
-    public List<Event> getLikedEventsByUserId(Long userId, Integer from, Integer size) {
+    public List<Event> getLikedEventsByUserId(Long userId, Integer from, Integer size, String sort) {
         User userLiked = adminService.findUserById(userId);
         List<Like> likes = likesRepository.findByUserAndIsLikeIsTrue(userLiked);
         List<Long> eventIds = likes.stream().map(like -> like.getEvent().getId()).collect(Collectors.toList());
         log.info("Выполняется поиск событий c ID: {} понравившихся пользователю с ID = {}, " +
                 "пропуская первые: {} событий, размер списка:{}", eventIds, userId, from, size);
-        return eventRepository.findAllById(eventIds).stream().skip(from).limit(size).collect(Collectors.toList());
+        if (sort.equals("ASC")) {
+            return eventRepository.findAllById(eventIds).stream()
+                    .sorted(Comparator.comparing(Event::getRate))
+                    .skip(from)
+                    .limit(size)
+                    .collect(Collectors.toList());
+        }
+        if (sort.equals("DESC")) {
+            return eventRepository.findAllById(eventIds).stream()
+                    .sorted(Comparator.comparing(Event::getRate).reversed())
+                    .skip(from)
+                    .limit(size)
+                    .collect(Collectors.toList());
+        }
+        return eventRepository.findAllById(eventIds).stream()
+                .skip(from)
+                .limit(size)
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -262,6 +279,23 @@ public class PrivateServiceImpl implements PrivateService {
                 userId, likeToRemove.getEvent().getId());
         calculateAndSetEventRate(likeToRemove.getEvent());
         calculateAndSetUserRate(likeToRemove.getEvent().getUser());
+    }
+
+    @Override
+    public List<Event> getSortedEventsByUserId(Long userId, Integer from, Integer size, String sort) {
+        List<Event> foundEvents = eventRepository.getAllEventsByUserId(userId);
+        if (sort.equals("ASC")) {
+            return foundEvents.stream()
+                    .sorted(Comparator.comparing(Event::getRate))
+                    .skip(from)
+                    .limit(size)
+                    .collect(Collectors.toList());
+        }
+        return foundEvents.stream()
+                .sorted(Comparator.comparing(Event::getRate).reversed())
+                .skip(from)
+                .limit(size)
+                .collect(Collectors.toList());
     }
 
     private void calculateAndSetEventRate(Event event) {

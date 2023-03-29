@@ -41,10 +41,17 @@ public class PrivateController {
     @GetMapping("/{userId}/events")
     public List<EventShortDto> getEvents(@PathVariable Long userId,
                                          @RequestParam(defaultValue = "0") Integer from,
-                                         @RequestParam(defaultValue = "10") Integer size) {
+                                         @RequestParam(defaultValue = "10") Integer size,
+                                         @RequestParam(defaultValue = "NO") String sort) {
         log.info("PublicController: Получен запрос на поиск событий, добавленных пользователем с ID = {}," +
-                "пропуская первых {}, размер списка = {}", userId, from, size);
-        return privateService.getEventsByUserId(userId, from, size)
+                "пропуская первых {}, размер списка = {}, сортировка по рейтингу: {}", userId, from, size, sort);
+        if (sort.equals("NO")) {
+            return privateService.getEventsByUserId(userId, from, size)
+                    .stream()
+                    .map(EventMapper::toEventShortDto)
+                    .collect(Collectors.toList());
+        }
+        return privateService.getSortedEventsByUserId(userId, from, size, sort)
                 .stream()
                 .map(EventMapper::toEventShortDto)
                 .collect(Collectors.toList());
@@ -112,7 +119,7 @@ public class PrivateController {
                 .collect(Collectors.toList());
     }
 
-    @PostMapping("/{userId}/events/{eventId}")
+    @PostMapping("/{userId}/likes/{eventId}")
     @ResponseStatus(HttpStatus.CREATED)
     public LikeDto addLike(@PathVariable Long userId,
                            @PathVariable Long eventId,
@@ -124,8 +131,8 @@ public class PrivateController {
 
     @PatchMapping("/{userId}/likes/{likeId}")
     public LikeDto changeLike(@PathVariable Long userId,
-                           @PathVariable Long likeId,
-                           @RequestParam Boolean like) {
+                              @PathVariable Long likeId,
+                              @RequestParam Boolean like) {
         log.info("PublicController: Получен запрос на изменение лайка ID = {} " +
                 "от пользователя ID = {}", likeId, userId);
         return LikeMapper.toDto(privateService.changeLike(userId, likeId, like));
@@ -134,10 +141,12 @@ public class PrivateController {
     @GetMapping("/{userId}/likes")
     public List<EventShortDto> getLikedEvents(@PathVariable Long userId,
                                               @RequestParam(defaultValue = "0") Integer from,
-                                              @RequestParam(defaultValue = "10") Integer size) {
+                                              @RequestParam(defaultValue = "10") Integer size,
+                                              @RequestParam(defaultValue = "NO") String sort) {
         log.info("PublicController: Получен запрос от пользователя ID = {} на получения списка понравившехся событий," +
-                "пропуская первых: {} событий, размер списка: {}", userId, from, size);
-        return privateService.getLikedEventsByUserId(userId, from, size)
+                        "пропуская первых: {} событий, размер списка: {}, сортировка по рейтингу: {}",
+                userId, from, size, sort);
+        return privateService.getLikedEventsByUserId(userId, from, size, sort)
                 .stream()
                 .map(EventMapper::toEventShortDto)
                 .collect(Collectors.toList());

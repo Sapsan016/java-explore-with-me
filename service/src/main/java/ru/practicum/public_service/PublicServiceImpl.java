@@ -117,9 +117,9 @@ public class PublicServiceImpl implements PublicService {
     @Override
     public Event getEventById(Long eventId) {
         log.info("Выполняется поиск события Id = {}", eventId);
-         Event foundEvent = eventRepository.findById(eventId).orElseThrow(() ->
+        Event foundEvent = eventRepository.findById(eventId).orElseThrow(() ->
                 new ObjectNotFoundException(String.format("Подборка событий ID=%s не найдена", eventId)));
-         foundEvent.setViews(foundEvent.getViews() + 1);
+        foundEvent.setViews(foundEvent.getViews() + 1);
         return foundEvent;
     }
 
@@ -146,10 +146,18 @@ public class PublicServiceImpl implements PublicService {
                     .limit(size)
                     .collect(Collectors.toList());
         }
-        if (sort.equals("RATE")) {
+        if (sort.equals("RATE_ASC")) {
             return foundEvents.stream()
                     .filter(event -> event.getPaid().equals(paid))
                     .sorted(Comparator.comparing(Event::getRate))
+                    .skip(from)
+                    .limit(size)
+                    .collect(Collectors.toList());
+        }
+        if (sort.equals("RATE_DESC")) {
+            return foundEvents.stream()
+                    .filter(event -> event.getPaid().equals(paid))
+                    .sorted(Comparator.comparing(Event::getRate).reversed())
                     .skip(from)
                     .limit(size)
                     .collect(Collectors.toList());

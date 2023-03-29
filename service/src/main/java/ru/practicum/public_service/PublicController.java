@@ -25,7 +25,6 @@ import java.util.stream.Collectors;
 public class PublicController {
     private final PublicService publicService;
 
-
     private final StatisticClient statisticClient;
 
 
@@ -81,7 +80,7 @@ public class PublicController {
                                             @RequestParam(required = false) String rangeStart,
                                             @RequestParam(required = false) String rangeEnd,
                                             @RequestParam(defaultValue = "false") Boolean onlyAvailable,
-                                            @RequestParam(defaultValue = "") String sort,
+                                            @RequestParam(defaultValue = "NO") String sort,
                                             @RequestParam(defaultValue = "0") Integer from,
                                             @RequestParam(defaultValue = "10") Integer size,
                                             HttpServletRequest request) {

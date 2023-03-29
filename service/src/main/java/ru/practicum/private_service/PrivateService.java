@@ -36,7 +36,9 @@ public interface PrivateService {
 
     Like changeLike(Long userId, Long likeId, Boolean like);
 
-    List<Event> getLikedEventsByUserId(Long userId, Integer from, Integer size);
+    List<Event> getLikedEventsByUserId(Long userId, Integer from, Integer size, String sort);
 
     void removeLike(Long userId, Long likeId);
+
+    List<Event> getSortedEventsByUserId(Long userId, Integer from, Integer size, String sort);
 }

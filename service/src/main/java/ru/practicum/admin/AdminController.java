@@ -66,11 +66,12 @@ public class AdminController {
     @GetMapping("/users")
     public List<UserDto> getUsers(@RequestParam(required = false, defaultValue = "") Long[] ids,
                                   @RequestParam(defaultValue = "0") Integer from,
-                                  @RequestParam(defaultValue = "10") Integer size) {
-        log.info("AdminController: Получен запрос на поиск пользователей с номерами ID: {}, " +
-                "пропуская первых {}, размер списка = {}", Arrays.toString(ids), from, size);
+                                  @RequestParam(defaultValue = "10") Integer size,
+                                  @RequestParam(defaultValue = "NO") String sort) {
+        log.info("AdminController: Получен запрос на поиск пользователей с номерами ID: {}, пропуская первых {}, " +
+                "размер списка = {}, сортировка по рейтингу: {}", Arrays.toString(ids), from, size, sort);
 
-        return adminService.getUsers(ids, from, size)
+        return adminService.getUsers(ids, from, size, sort)
                 .stream()
                 .map(UserMapper::toUserDto)
                 .collect(Collectors.toList());

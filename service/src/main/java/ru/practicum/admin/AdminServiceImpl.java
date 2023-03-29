@@ -23,6 +23,7 @@ import ru.practicum.repositories.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -97,18 +98,18 @@ public class AdminServiceImpl implements AdminService {
     }
 
     @Override
-    public List<User> getUsers(Long[] ids, Integer from, Integer size) {
+    public List<User> getUsers(Long[] ids, Integer from, Integer size, String sort) {
         if (ids.length == 0) {
-            log.info("Выполняется поиск всех пользователей пропуская первых {}, размер списка {}", from, size);
-            return userRepository.getAllUsers(from, size);
+            log.info("Выполняется поиск всех пользователей пропуская первых {}, размер списка {}, " +
+                    "сортировка по рейтингу {}", from, size, sort);
+            List<User> foundUsers = userRepository.getAllUsers(from, size);
+            return sortAndReturnUsers(foundUsers, from, size, sort);
         }
         log.info("Выполняется поиск всех пользователей с ID {} пропуская первых {}, размер списка {}",
                 Arrays.toString(ids), from, size);
         try {
-            return Arrays.stream(ids).map(this::findUserById)
-                    .skip(from)
-                    .limit(size)
-                    .collect(Collectors.toList());
+            List<User> foundUsers = Arrays.stream(ids).map(this::findUserById).collect(Collectors.toList());
+            return sortAndReturnUsers(foundUsers, from, size, sort);
         } catch (ObjectNotFoundException e) {
             return new ArrayList<>();
         }
@@ -408,6 +409,27 @@ public class AdminServiceImpl implements AdminService {
                 .map(EventMapper::toEventShortDto).collect(Collectors.toList());
         compilation.setEvents(compilationEvents);
         return compilation;
+    }
+
+    private List<User> sortAndReturnUsers(List<User> foundUsers, Integer from, Integer size, String sort) {
+        if (sort.equals("DESC")) {
+            return foundUsers.stream()
+                    .sorted(Comparator.comparing(User::getUserRate))
+                    .skip(from)
+                    .limit(size)
+                    .collect(Collectors.toList());
+        }
+        if (sort.equals("ASC")) {
+            return foundUsers.stream()
+                    .sorted(Comparator.comparing(User::getUserRate).reversed())
+                    .skip(from)
+                    .limit(size)
+                    .collect(Collectors.toList());
+        }
+        return foundUsers.stream()
+                .skip(from)
+                .limit(size)
+                .collect(Collectors.toList());
     }
 
 

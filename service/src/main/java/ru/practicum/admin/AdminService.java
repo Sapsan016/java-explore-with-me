@@ -23,7 +23,7 @@ public interface AdminService {
 
     void removeUser(Long userId);
 
-    List<User> getUsers(Long[] ids, Integer from, Integer size);
+    List<User> getUsers(Long[] ids, Integer from, Integer size, String sort);
 
     Category findCategoryById(Long catId);
 

@@ -146,6 +146,14 @@ public class PublicServiceImpl implements PublicService {
                     .limit(size)
                     .collect(Collectors.toList());
         }
+        if (sort.equals("RATE")) {
+            return foundEvents.stream()
+                    .filter(event -> event.getPaid().equals(paid))
+                    .sorted(Comparator.comparing(Event::getRate))
+                    .skip(from)
+                    .limit(size)
+                    .collect(Collectors.toList());
+        }
         return foundEvents.stream()
                 .filter(event -> event.getPaid().equals(paid))
                 .sorted(Comparator.comparing(Event::getViews))

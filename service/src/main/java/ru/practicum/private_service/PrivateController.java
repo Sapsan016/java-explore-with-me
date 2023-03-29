@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.*;
 import ru.practicum.dto.events.EventFullDto;
 import ru.practicum.dto.events.EventShortDto;
 import ru.practicum.dto.events.NewEventDto;
-import ru.practicum.dto.events.likes.LikeDto;
+import ru.practicum.dto.events.likes.LikesDto;
 import ru.practicum.dto.events.requests.EventRequestStatusUpdateRequest;
 import ru.practicum.dto.events.requests.EventRequestStatusUpdateResult;
 import ru.practicum.dto.events.requests.ParticipationRequestDto;
@@ -121,18 +121,18 @@ public class PrivateController {
 
     @PostMapping("/{userId}/likes/{eventId}")
     @ResponseStatus(HttpStatus.CREATED)
-    public LikeDto addLike(@PathVariable Long userId,
-                           @PathVariable Long eventId,
-                           @RequestParam(defaultValue = "true") Boolean like) {
+    public LikesDto addLike(@PathVariable Long userId,
+                            @PathVariable Long eventId,
+                            @RequestParam(defaultValue = "true") Boolean like) {
         log.info("PublicController: Получен запрос на добавление лайка: {} событию ID = {} " +
                 "от пользователя ID = {}", like, eventId, userId);
         return LikeMapper.toDto(privateService.addLike(userId, eventId, like));
     }
 
     @PatchMapping("/{userId}/likes/{likeId}")
-    public LikeDto changeLike(@PathVariable Long userId,
-                              @PathVariable Long likeId,
-                              @RequestParam Boolean like) {
+    public LikesDto changeLike(@PathVariable Long userId,
+                               @PathVariable Long likeId,
+                               @RequestParam Boolean like) {
         log.info("PublicController: Получен запрос на изменение лайка ID = {} " +
                 "от пользователя ID = {}", likeId, userId);
         return LikeMapper.toDto(privateService.changeLike(userId, likeId, like));

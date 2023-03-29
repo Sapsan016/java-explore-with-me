@@ -12,7 +12,7 @@ import ru.practicum.dto.users.UserShortDto;
 @AllArgsConstructor
 @NoArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class LikeDto {
+public class LikesDto {
 
     Long id;
 

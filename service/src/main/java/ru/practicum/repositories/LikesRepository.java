@@ -1,7 +1,6 @@
 package ru.practicum.repositories;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
 import ru.practicum.model.Event;
 import ru.practicum.model.Like;
 import ru.practicum.model.User;

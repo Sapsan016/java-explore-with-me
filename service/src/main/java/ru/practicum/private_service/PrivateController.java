@@ -141,7 +141,14 @@ public class PrivateController {
                 .stream()
                 .map(EventMapper::toEventShortDto)
                 .collect(Collectors.toList());
+    }
 
+    @DeleteMapping("/{userId}/likes/{likeId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteLike(@PathVariable Long userId, @PathVariable Long likeId) {
+        log.info("PublicController: Получен запрос на удаление лайка ID = {} " +
+                "от пользователя ID = {}", likeId, userId);
+        privateService.removeLike(userId, likeId);
     }
 
 

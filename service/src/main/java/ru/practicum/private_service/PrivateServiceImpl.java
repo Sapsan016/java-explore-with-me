@@ -18,10 +18,7 @@ import ru.practicum.exception.ObjectNotFoundException;
 import ru.practicum.mappers.EventMapper;
 import ru.practicum.mappers.RequestMapper;
 import ru.practicum.model.*;
-import ru.practicum.repositories.EventRepository;
-import ru.practicum.repositories.LikesRepository;
-import ru.practicum.repositories.LocationRepository;
-import ru.practicum.repositories.RequestRepository;
+import ru.practicum.repositories.*;
 
 import java.time.LocalDateTime;
 import java.util.Comparator;
@@ -40,13 +37,16 @@ public class PrivateServiceImpl implements PrivateService {
     RequestRepository requestRepository;
     LikesRepository likesRepository;
 
+    UserRepository userRepository;
+
     public PrivateServiceImpl(EventRepository eventRepository, LocationRepository locationRepository,
-                              AdminService adminService, RequestRepository requestRepository, LikesRepository likesRepository) {
+                              AdminService adminService, RequestRepository requestRepository, LikesRepository likesRepository, UserRepository userRepository) {
         this.eventRepository = eventRepository;
         this.locationRepository = locationRepository;
         this.adminService = adminService;
         this.requestRepository = requestRepository;
         this.likesRepository = likesRepository;
+        this.userRepository = userRepository;
     }
 
     @Override
@@ -214,8 +214,7 @@ public class PrivateServiceImpl implements PrivateService {
 
     @Override
     public Like addLike(Long userId, Long eventId, Boolean like) {
-        Event eventToLike = eventRepository.findById(eventId).orElseThrow(() ->
-                new ObjectNotFoundException(String.format("Событие с ID=%s не найдено", eventId)));
+        Event eventToLike = findEventById(eventId);
         if (!eventToLike.getState().equals(EventState.PUBLISHED))
             throw new IllegalArgumentException("Событие не опубликовано.");
         User userLike = adminService.findUserById(userId);
@@ -226,26 +225,24 @@ public class PrivateServiceImpl implements PrivateService {
         likesRepository.save(likeToAdd);
         log.info("Добавлен лайк с ID = {}, пользователем с ID = {} событию с ID = {}", likeToAdd.getId(),
                 userId, eventId);
-        Integer rate = likesRepository.countByIsLikeIsTrueAndEvent(eventToLike) -
-                likesRepository.countByIsLikeIsFalseAndEvent(eventToLike);
-
-       eventToLike.setRate(rate);
-       eventRepository.save(eventToLike);
-        log.info("У события с ID = {} установлен рейтинг:{}", eventId, rate);
+        calculateAndSetEventRate(eventToLike);
+        calculateAndSetUserRate(eventToLike.getUser());
         return likeToAdd;
     }
 
     @Override
     public Like changeLike(Long userId, Long likeId, Boolean like) {
-        Like likeToChange = likesRepository.findById(likeId).orElseThrow(() ->
-                new ObjectNotFoundException(String.format("Событие с ID=%s не найдено", likeId)));
-        if (!likeToChange.getUser().getId().equals(userId))
-            throw new IllegalArgumentException("Пользователь не ставил лайк этому событию");
+        Like likeToChange = checkAndReturnLike(likeId, userId);
         likeToChange.setIsLike(like);
         likesRepository.save(likeToChange);
         log.info("Изменен лайк с ID = {}, пользователем с ID = {}", likeId, userId);
+        Event likedEvent = findEventById(likeToChange.getId());
+        calculateAndSetEventRate(likedEvent);
+        calculateAndSetUserRate(likedEvent.getUser());
+
         return likeToChange;
     }
+
 
     @Override
     public List<Event> getLikedEventsByUserId(Long userId, Integer from, Integer size) {
@@ -257,11 +254,62 @@ public class PrivateServiceImpl implements PrivateService {
         return eventRepository.findAllById(eventIds).stream().skip(from).limit(size).collect(Collectors.toList());
     }
 
+    @Override
+    public void removeLike(Long userId, Long likeId) {
+        Like likeToRemove = checkAndReturnLike(likeId, userId);
+        likesRepository.delete(likeToRemove);
+        log.info("Удален лайк от пользователя с ID = {}, поставленный событию с ID = {}",
+                userId, likeToRemove.getEvent().getId());
+        calculateAndSetEventRate(likeToRemove.getEvent());
+        calculateAndSetUserRate(likeToRemove.getEvent().getUser());
+
+
+    }
+
+    private void calculateAndSetEventRate(Event event) {
+        Integer rate = likesRepository.countByIsLikeIsTrueAndEvent(event) -
+                likesRepository.countByIsLikeIsFalseAndEvent(event);
+        event.setRate(rate);
+        eventRepository.save(event);
+        log.info("Для события с ID = {} установлен рейтинг:{}", event.getId(), rate);
+    }
+    private void calculateAndSetUserRate(User user) {
+        List<Event> userEvents = getEventsByUserId(user.getId(), 0, Integer.MAX_VALUE);
+        Double averageUserRate = 0.0;
+        for (Event event : userEvents) {
+            averageUserRate += event.getRate();
+        }
+        System.out.println("AVERAGE USER RATE : " + averageUserRate);
+        System.out.println("EVENTS : " + userEvents.size());
+
+
+        averageUserRate = averageUserRate / userEvents.size();
+
+
+
+
+        System.out.println("AVERAGE RATE : " + averageUserRate);
+        user.setUserRate(averageUserRate);
+        log.info("Для пользователя с ID = {} установлен рейтинг:{}", user.getId(), averageUserRate);
+        userRepository.save(user);
+    }
+
+
+
+
 
     private boolean checkRequestsCount(Event requestedEvent) {
         Integer requestCount = requestRepository.countParticipationRequestsByEventAndStatus(requestedEvent.getId(),
                 RequestState.CONFIRMED);
         return requestCount >= (requestedEvent.getParticipantLimit());
+    }
+
+    private Like checkAndReturnLike(Long likeId, Long userId) {
+        Like likeToChange = likesRepository.findById(likeId).orElseThrow(() ->
+                new ObjectNotFoundException(String.format("Событие с ID=%s не найдено", likeId)));
+        if (!likeToChange.getUser().getId().equals(userId))
+            throw new IllegalArgumentException("Пользователь не ставил лайк этому событию");
+        return likeToChange;
     }
 
     private void updateRequestsWithoutModeration(Event event, EventRequestStatusUpdateRequest updateRequest) {

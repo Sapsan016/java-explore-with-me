@@ -19,4 +19,6 @@ public class User {
     Long id;
     String name;
     String email;
+    @Column(name = "user_rate")
+    Double userRate;
 }

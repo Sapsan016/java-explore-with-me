@@ -36,6 +36,12 @@ public class PublicServiceImpl implements PublicService {
 
     RequestRepository requestRepository;
 
+    String DATE = "EVENT_DATE";
+
+    String UP = "RATE_ASC";
+
+    String DOWN = "RATE_DESC";
+
     public PublicServiceImpl(CategoryRepository categoryRepository, AdminService adminService,
                              CompilationRepository compilationRepository, CompEventDAO compEventDAO,
                              EventRepository eventRepository, RequestRepository requestRepository) {
@@ -138,7 +144,7 @@ public class PublicServiceImpl implements PublicService {
                             .countParticipationRequestsByEventAndStatus(event.getId(), RequestState.CONFIRMED))
                     .collect(Collectors.toList());
         }
-        if (sort.equals("EVENT_DATE")) {
+        if (sort.equals(DATE)) {
             return foundEvents.stream()
                     .filter(event -> event.getPaid().equals(paid))
                     .sorted(Comparator.comparing(Event::getEventDate))
@@ -146,7 +152,7 @@ public class PublicServiceImpl implements PublicService {
                     .limit(size)
                     .collect(Collectors.toList());
         }
-        if (sort.equals("RATE_ASC")) {
+        if (sort.equals(UP)) {
             return foundEvents.stream()
                     .filter(event -> event.getPaid().equals(paid))
                     .sorted(Comparator.comparing(Event::getRate))
@@ -154,7 +160,7 @@ public class PublicServiceImpl implements PublicService {
                     .limit(size)
                     .collect(Collectors.toList());
         }
-        if (sort.equals("RATE_DESC")) {
+        if (sort.equals(DOWN)) {
             return foundEvents.stream()
                     .filter(event -> event.getPaid().equals(paid))
                     .sorted(Comparator.comparing(Event::getRate).reversed())

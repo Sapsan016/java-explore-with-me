@@ -43,6 +43,9 @@ public class AdminServiceImpl implements AdminService {
 
     CompEventDAO compEventDAO;
 
+    String UP = "ASC";
+    String DOWN = "DESC";
+
 
     public AdminServiceImpl(CategoryRepository categoryRepository, UserRepository userRepository,
                             EventRepository eventRepository, LocationRepository locationRepository,
@@ -406,14 +409,14 @@ public class AdminServiceImpl implements AdminService {
     }
 
     private List<User> sortAndReturnUsers(List<User> foundUsers, Integer from, Integer size, String sort) {
-        if (sort.equals("ASC")) {
+        if (sort.equals(UP)) {
             return foundUsers.stream()
                     .sorted(Comparator.comparing(User::getUserRate))
                     .skip(from)
                     .limit(size)
                     .collect(Collectors.toList());
         }
-        if (sort.equals("DESC")) {
+        if (sort.equals(DOWN)) {
             return foundUsers.stream()
                     .sorted(Comparator.comparing(User::getUserRate).reversed())
                     .skip(from)
@@ -427,14 +430,14 @@ public class AdminServiceImpl implements AdminService {
     }
 
     private List<Event> sortLimitAndReturnEvents(List<Event> foundEvents, Integer from, Integer size, String sort) {
-        if (sort.equals("ASC")) {
+        if (sort.equals(UP)) {
             return foundEvents.stream()
                     .sorted(Comparator.comparing(Event::getRate))
                     .skip(from)
                     .limit(size)
                     .collect(Collectors.toList());
         }
-        if (sort.equals("DESC")) {
+        if (sort.equals(DOWN)) {
             return foundEvents.stream()
                     .sorted(Comparator.comparing(Event::getRate).reversed())
                     .skip(from)
@@ -448,18 +451,17 @@ public class AdminServiceImpl implements AdminService {
     }
 
     private List<Event> sortAndReturnEvents(List<Event> foundEvents, String sort) {
-        if (sort.equals("ASC")) {
+        if (sort.equals(UP)) {
             return foundEvents.stream()
                     .sorted(Comparator.comparing(Event::getRate))
                     .collect(Collectors.toList());
         }
-        if (sort.equals("DESC")) {
+        if (sort.equals(DOWN)) {
             return foundEvents.stream()
                     .sorted(Comparator.comparing(Event::getRate).reversed())
                     .collect(Collectors.toList());
         }
         return foundEvents;
     }
-
 
 }

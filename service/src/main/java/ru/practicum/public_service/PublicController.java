@@ -1,5 +1,7 @@
 package ru.practicum.public_service;
 
+import lombok.AccessLevel;
+import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.client.StatisticClient;
@@ -22,14 +24,13 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping
 @Slf4j
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class PublicController {
-    private final PublicService publicService;
+    PublicService publicService;
 
-    private final StatisticClient statisticClient;
+    StatisticClient statisticClient;
 
-
-    public static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-
+    DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
     public PublicController(PublicService publicService, StatisticClient statisticClient) {
         this.publicService = publicService;

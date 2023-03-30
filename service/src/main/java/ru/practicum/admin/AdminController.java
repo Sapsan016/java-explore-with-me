@@ -1,5 +1,7 @@
 package ru.practicum.admin;
 
+import lombok.AccessLevel;
+import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -26,11 +28,12 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/admin")
 @Slf4j
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class AdminController {
 
-    public static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+    DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
-    private final AdminService adminService;
+    AdminService adminService;
 
     public AdminController(AdminService adminService) {
         this.adminService = adminService;

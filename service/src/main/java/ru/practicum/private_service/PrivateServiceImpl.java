@@ -36,11 +36,15 @@ public class PrivateServiceImpl implements PrivateService {
     AdminService adminService;
     RequestRepository requestRepository;
     LikesRepository likesRepository;
-
     UserRepository userRepository;
 
+    String UP = "ASC";
+
+    String DOWN = "DESC";
+
     public PrivateServiceImpl(EventRepository eventRepository, LocationRepository locationRepository,
-                              AdminService adminService, RequestRepository requestRepository, LikesRepository likesRepository, UserRepository userRepository) {
+                              AdminService adminService, RequestRepository requestRepository,
+                              LikesRepository likesRepository, UserRepository userRepository) {
         this.eventRepository = eventRepository;
         this.locationRepository = locationRepository;
         this.adminService = adminService;
@@ -216,10 +220,12 @@ public class PrivateServiceImpl implements PrivateService {
     public Like addLike(Long userId, Long eventId, Boolean like) {
         Event eventToLike = findEventById(eventId);
         if (!eventToLike.getState().equals(EventState.PUBLISHED))
-            throw new IllegalArgumentException("Событие не опубликовано.");
+            throw new IllegalArgumentException(String.format("Событие с ID = %s не опубликовано администратором.",
+                    eventId));
         User userLike = adminService.findUserById(userId);
         if (likesRepository.findByEventAndUser(eventToLike, userLike) != null)
-            throw new IllegalArgumentException("Пользователь уже поставил лайк этому событию");
+            throw new IllegalArgumentException(String.format("Пользователь с ID = %s уже поставил лайк событию " +
+                    "c ID = %s", userId, eventId));
 
         Like likeToAdd = new Like(null, eventToLike, userLike, like);
         likesRepository.save(likeToAdd);
@@ -251,14 +257,14 @@ public class PrivateServiceImpl implements PrivateService {
         List<Long> eventIds = likes.stream().map(like -> like.getEvent().getId()).collect(Collectors.toList());
         log.info("Выполняется поиск событий c ID: {} понравившихся пользователю с ID = {}, " +
                 "пропуская первые: {} событий, размер списка:{}", eventIds, userId, from, size);
-        if (sort.equals("ASC")) {
+        if (sort.equals(UP)) {
             return eventRepository.findAllById(eventIds).stream()
                     .sorted(Comparator.comparing(Event::getRate))
                     .skip(from)
                     .limit(size)
                     .collect(Collectors.toList());
         }
-        if (sort.equals("DESC")) {
+        if (sort.equals(DOWN)) {
             return eventRepository.findAllById(eventIds).stream()
                     .sorted(Comparator.comparing(Event::getRate).reversed())
                     .skip(from)
@@ -284,7 +290,7 @@ public class PrivateServiceImpl implements PrivateService {
     @Override
     public List<Event> getSortedEventsByUserId(Long userId, Integer from, Integer size, String sort) {
         List<Event> foundEvents = eventRepository.getAllEventsByUserId(userId);
-        if (sort.equals("ASC")) {
+        if (sort.equals(UP)) {
             return foundEvents.stream()
                     .sorted(Comparator.comparing(Event::getRate))
                     .skip(from)

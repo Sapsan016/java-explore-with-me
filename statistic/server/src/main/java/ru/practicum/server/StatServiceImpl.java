@@ -51,7 +51,7 @@ public class StatServiceImpl implements StatService {
 
     @Override
     public List<HitDto> getAllStats(LocalDateTime start, LocalDateTime end) {
-        log.info("Запрошена вся статистика за период с {} по {} ", start, end );
+        log.info("Запрошена вся статистика за период с {} по {} ", start, end);
         List<EndpointHit> list = statRepository.findAllByTimestampBetween(start, end);
         int hits = list.size();
         return list.stream().map(HitMapper::toHitDto).peek(hitDto -> hitDto.setHits(hits)).collect(Collectors.toList());

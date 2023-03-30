@@ -242,10 +242,9 @@ public class PrivateServiceImpl implements PrivateService {
         likeToChange.setIsLike(like);
         likesRepository.save(likeToChange);
         log.info("Изменен лайк с ID = {}, пользователем с ID = {}", likeId, userId);
-        Event likedEvent = findEventById(likeToChange.getId());
+        Event likedEvent = findEventById(likeToChange.getEvent().getId());
         calculateAndSetEventRate(likedEvent);
         calculateAndSetUserRate(likedEvent.getUser());
-
         return likeToChange;
     }
 

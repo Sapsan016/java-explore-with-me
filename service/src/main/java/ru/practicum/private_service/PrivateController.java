@@ -67,7 +67,7 @@ public class PrivateController {
     @PatchMapping("/{userId}/events/{eventId}")
     public EventFullDto updateEvent(@RequestBody @Valid UpdateEventRequest updateEventDto, @PathVariable Long userId,
                                     @PathVariable Long eventId) {
-        log.info("PublicController: Получен запрос на обновления события {} от пользователя ID = {}",
+        log.info("PrivateController: Получен запрос на обновления события {} от пользователя ID = {}",
                 updateEventDto, userId);
         return EventMapper.toEventFullDto(privateService.updateEvent(updateEventDto, userId, eventId));
     }
@@ -76,14 +76,14 @@ public class PrivateController {
     @ResponseStatus(HttpStatus.CREATED)
     public ParticipationRequestDto addRequest(@PathVariable Long userId,
                                               @RequestParam Long eventId) {
-        log.info("PublicController: Получен новый запрос на участие в событии ID = {} от пользователя ID = {}",
+        log.info("PrivateController: Получен новый запрос на участие в событии ID = {} от пользователя ID = {}",
                 eventId, userId);
         return RequestMapper.toDto(privateService.addRequest(userId, eventId));
     }
 
     @GetMapping("/{userId}/requests")
     public List<ParticipationRequestDto> getUserRequest(@PathVariable Long userId) {
-        log.info("PublicController: Получен поиск запросов, добавленных пользователем с ID = {}", userId);
+        log.info("PrivateController: Получен поиск запросов, добавленных пользователем с ID = {}", userId);
         return privateService.getUserRequests(userId)
                 .stream()
                 .map(RequestMapper::toDto)
@@ -93,7 +93,7 @@ public class PrivateController {
     @PatchMapping("/{userId}/requests/{requestId}/cancel")
     public ParticipationRequestDto cancelRequest(@PathVariable Long userId,
                                                  @PathVariable Long requestId) {
-        log.info("PublicController: Получено удаление поиск запроса с ID = {}, от пользователя с ID = {}",
+        log.info("PrivateController: Получено удаление поиск запроса с ID = {}, от пользователя с ID = {}",
                 requestId, userId);
         return RequestMapper.toDto(privateService.cancelRequest(userId, requestId));
     }
@@ -102,7 +102,7 @@ public class PrivateController {
     public EventRequestStatusUpdateResult updateRequest(@RequestBody EventRequestStatusUpdateRequest updateRequest,
                                                         @PathVariable Long userId,
                                                         @PathVariable Long eventId) {
-        log.info("PublicController: Получено обновление статуса запросов {} на участие в событии с ID = {}, " +
+        log.info("PrivateController: Получено обновление статуса запросов {} на участие в событии с ID = {}, " +
                 "добавленном пользователем с Id = {}", updateRequest, eventId, userId);
         return privateService.updateRequest(updateRequest, userId, eventId);
 
@@ -111,7 +111,7 @@ public class PrivateController {
     @GetMapping("/{userId}/events/{eventId}/requests")
     public List<ParticipationRequestDto> getUserEventRequest(@PathVariable Long userId,
                                                              @PathVariable Long eventId) {
-        log.info("PublicController: Получен поиск информации о запросах на участие " +
+        log.info("PrivateController: Получен поиск информации о запросах на участие " +
                 "в событии с ID = {}, добавленном пользователем ID = {}", eventId, userId);
         return privateService.getUserEventRequests(userId, eventId)
                 .stream()
@@ -124,7 +124,7 @@ public class PrivateController {
     public LikesDto addLike(@PathVariable Long userId,
                             @PathVariable Long eventId,
                             @RequestParam(defaultValue = "true") Boolean like) {
-        log.info("PublicController: Получен запрос на добавление лайка: {} событию ID = {} " +
+        log.info("PrivateController: Получен запрос на добавление лайка: {} событию ID = {} " +
                 "от пользователя ID = {}", like, eventId, userId);
         return LikeMapper.toDto(privateService.addLike(userId, eventId, like));
     }
@@ -133,7 +133,7 @@ public class PrivateController {
     public LikesDto changeLike(@PathVariable Long userId,
                                @PathVariable Long likeId,
                                @RequestParam Boolean like) {
-        log.info("PublicController: Получен запрос на изменение лайка ID = {} " +
+        log.info("PrivateController: Получен запрос на изменение лайка ID = {} " +
                 "от пользователя ID = {}", likeId, userId);
         return LikeMapper.toDto(privateService.changeLike(userId, likeId, like));
     }
@@ -143,7 +143,7 @@ public class PrivateController {
                                               @RequestParam(defaultValue = "0") Integer from,
                                               @RequestParam(defaultValue = "10") Integer size,
                                               @RequestParam(defaultValue = "NO") String sort) {
-        log.info("PublicController: Получен запрос от пользователя ID = {} на получения списка понравившехся событий," +
+        log.info("PrivateController: Получен запрос от пользователя ID = {} на получения списка понравившехся событий," +
                         "пропуская первых: {} событий, размер списка: {}, сортировка по рейтингу: {}",
                 userId, from, size, sort);
         return privateService.getLikedEventsByUserId(userId, from, size, sort)
@@ -155,7 +155,7 @@ public class PrivateController {
     @DeleteMapping("/{userId}/likes/{likeId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteLike(@PathVariable Long userId, @PathVariable Long likeId) {
-        log.info("PublicController: Получен запрос на удаление лайка ID = {} " +
+        log.info("PrivateController: Получен запрос на удаление лайка ID = {} " +
                 "от пользователя ID = {}", likeId, userId);
         privateService.removeLike(userId, likeId);
     }

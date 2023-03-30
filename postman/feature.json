@@ -1,275 +1,11 @@
 {
 	"info": {
-		"_postman_id": "b23a7588-8d2e-4ca4-8696-dad00e928c1f",
-		"name": "Explore with me Rating",
+		"_postman_id": "79404926-114f-4925-bbf1-29b842f9f377",
+		"name": "Explore with me Rating New",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
 		"_exporter_id": "24061076"
 	},
 	"item": [
-		{
-			"name": "Create category id=1",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"pm.test(\"Status code is 201\", function () {\r",
-							"    pm.expect(pm.response.code).to.be.oneOf([201]);\r",
-							"});\r",
-							"pm.test(\"Test create category\", function () {\r",
-							"    var jsonData = pm.response.json();\r",
-							"    pm.expect(jsonData.id).to.eql(1);\r",
-							"    pm.expect(jsonData.name).to.eql('Концерты');\r",
-							"});"
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"method": "POST",
-				"header": [
-					{
-						"key": "Content-Type",
-						"value": "application/json",
-						"type": "text"
-					}
-				],
-				"body": {
-					"mode": "raw",
-					"raw": "{\r\n    \"name\": \"Концерты\"\r\n}"
-				},
-				"url": {
-					"raw": "{{baseUrl}}/admin/categories",
-					"host": [
-						"{{baseUrl}}"
-					],
-					"path": [
-						"admin",
-						"categories"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Add new user id = 1",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"pm.test(\"Status code is 201\", function () {\r",
-							"    pm.expect(pm.response.code).to.be.oneOf([201]);\r",
-							"});\r",
-							"pm.test(\"Test create user\", function () {\r",
-							"    var jsonData = pm.response.json();\r",
-							"    pm.expect(jsonData.email).to.eql('ivan.petrov@practicummail.ru');\r",
-							"    pm.expect(jsonData.id).to.eql(1);\r",
-							"    pm.expect(jsonData.name).to.eql('Иван Петров');\r",
-							"});"
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"method": "POST",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "{\r\n  \"email\": \"ivan.petrov@practicummail.ru\",\r\n  \"name\": \"Иван Петров\"\r\n}",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "{{baseUrl}}/admin/users",
-					"host": [
-						"{{baseUrl}}"
-					],
-					"path": [
-						"admin",
-						"users"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Add new user id = 2",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"pm.test(\"Status code is 201\", function () {\r",
-							"    pm.expect(pm.response.code).to.be.oneOf([201]);\r",
-							"});\r",
-							"pm.test(\"Test create user\", function () {\r",
-							"    var jsonData = pm.response.json();\r",
-							"    pm.expect(jsonData.email).to.eql('fedor.ivanov@practicummail.ru');\r",
-							"    pm.expect(jsonData.id).to.eql(2);\r",
-							"    pm.expect(jsonData.name).to.eql('Федор Иванов');\r",
-							"});"
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"method": "POST",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "{\r\n  \"email\": \"fedor.ivanov@practicummail.ru\",\r\n  \"name\": \"Федор Иванов\"\r\n}",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "{{baseUrl}}/admin/users",
-					"host": [
-						"{{baseUrl}}"
-					],
-					"path": [
-						"admin",
-						"users"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Create category id=2",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"pm.test(\"Status code is 201\", function () {\r",
-							"    pm.expect(pm.response.code).to.be.oneOf([201]);\r",
-							"});\r",
-							"pm.test(\"Test create category\", function () {\r",
-							"    var jsonData = pm.response.json();\r",
-							"    pm.expect(jsonData.id).to.eql(2);\r",
-							"    pm.expect(jsonData.name).to.eql('Спорт');\r",
-							"});"
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"method": "POST",
-				"header": [
-					{
-						"key": "Content-Type",
-						"value": "application/json",
-						"type": "text"
-					}
-				],
-				"body": {
-					"mode": "raw",
-					"raw": "{\r\n    \"name\": \"Спорт\"\r\n}"
-				},
-				"url": {
-					"raw": "{{baseUrl}}/admin/categories",
-					"host": [
-						"{{baseUrl}}"
-					],
-					"path": [
-						"admin",
-						"categories"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Add new event with id = 1 by user id = 1",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"pm.test(\"Ответ должен содержать код статуса 201 и данные в формате json\", function () {\r",
-							"    pm.response.to.have.status(201);  \r",
-							"    pm.response.to.be.withBody;\r",
-							"    pm.response.to.be.json;\r",
-							"});\r",
-							"const source = JSON.parse(pm.request.body.raw);\r",
-							"const target = pm.response.json();\r",
-							"\r",
-							"pm.test(\"Событие должно содержать поля: id, title, annotation, category, paid, eventDate, initiator, description, participantLimit, state, createdOn, location, requestModeration\", function () {\r",
-							"pm.expect(target).to.have.property('id');\r",
-							"pm.expect(target).to.have.property('title');\r",
-							"pm.expect(target).to.have.property('annotation');\r",
-							"pm.expect(target).to.have.property('category');\r",
-							"pm.expect(target).to.have.property('paid');\r",
-							"pm.expect(target).to.have.property('eventDate');\r",
-							"pm.expect(target).to.have.property('initiator');\r",
-							"pm.expect(target).to.have.property('description');\r",
-							"pm.expect(target).to.have.property('participantLimit');\r",
-							"pm.expect(target).to.have.property('state');\r",
-							"pm.expect(target).to.have.property('createdOn');\r",
-							"pm.expect(target).to.have.property('location');\r",
-							"pm.expect(target).to.have.property('requestModeration');\r",
-							"});\r",
-							"\r",
-							"pm.test(\"Данные в ответе должны соответствовать данным в запросе\", function () {\r",
-							"    pm.expect(target.id).to.not.be.null;\r",
-							"    pm.expect(target.title).equal(source.title, 'Название события должно соответствовать названию события в запросе');\r",
-							"    pm.expect(target.annotation).equal(source.annotation, 'Аннотация события должна соответствовать аннотации события в запросе');\r",
-							"    pm.expect(target.paid.toString()).equal(source.paid.toString(), 'Стоимость события должна соответствовать стоимости события в запросе');\r",
-							"    pm.expect(target.eventDate).equal(source.eventDate, 'Дата проведения события должна соответствовать дате проведения события в запросе');\r",
-							"    pm.expect(target.description).equal(source.description, 'Описание события должно соответствовать описание события в запросе');\r",
-							"    pm.expect(target.participantLimit.toString()).equal(source.participantLimit.toString(), 'Лимит участников события должно соответствовать лимиту участников события в запросе');\r",
-							"    pm.expect(target.location.lat.toString()).equal(source.location.lat.toString(), 'Широта локации проведения события должна соответствовать широте локации проведения события в запросе');\r",
-							"    pm.expect(target.location.lon.toString()).equal(source.location.lon.toString(), 'Долгота локации проведения события должна соответствовать долготе локации проведения события в запросе');\r",
-							"    pm.expect(target.requestModeration.toString()).equal(source.requestModeration.toString(), 'Необходимость модерации события должна соответствовать необходимости модерации события в запросе');\r",
-							"});"
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"method": "POST",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "{\r\n  \"annotation\": \"Сплав на байдарках похож на полет.\",\r\n  \"category\": 2,\r\n  \"description\": \"Сплав на байдарках похож на полет. На спокойной воде — это парение. На бурной, порожистой — выполнение фигур высшего пилотажа. И то, и другое дарят чувство обновления, феерические эмоции, яркие впечатления.\",\r\n  \"eventDate\": \"2024-12-31 15:10:05\",\r\n  \"location\": {\r\n    \"lat\": 55.754167,\r\n    \"lon\": 37.62\r\n  },\r\n  \"paid\": true,\r\n  \"participantLimit\": 10,\r\n  \"requestModeration\": false,\r\n  \"title\": \"Сплав на байдарках\"\r\n}",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "{{baseUrl}}/users/:userId/events",
-					"host": [
-						"{{baseUrl}}"
-					],
-					"path": [
-						"users",
-						":userId",
-						"events"
-					],
-					"variable": [
-						{
-							"key": "userId",
-							"value": "1"
-						}
-					]
-				}
-			},
-			"response": []
-		},
 		{
 			"name": "Add like to unpublished event",
 			"event": [
@@ -316,7 +52,7 @@
 						},
 						{
 							"key": "eventId",
-							"value": "1"
+							"value": "2"
 						}
 					]
 				}
@@ -324,7 +60,7 @@
 			"response": []
 		},
 		{
-			"name": "Publish event id = 1",
+			"name": "Publish event id = 2",
 			"event": [
 				{
 					"listen": "test",
@@ -394,7 +130,7 @@
 					"variable": [
 						{
 							"key": "eventId",
-							"value": "1"
+							"value": "2"
 						}
 					]
 				}
@@ -458,7 +194,7 @@
 						},
 						{
 							"key": "eventId",
-							"value": "1"
+							"value": "2"
 						}
 					]
 				}
@@ -509,7 +245,7 @@
 						},
 						{
 							"key": "eventId",
-							"value": "1"
+							"value": "2"
 						}
 					]
 				}
@@ -785,164 +521,6 @@
 			"response": []
 		},
 		{
-			"name": "Add new event with id = 2 by user id = 1",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"pm.test(\"Ответ должен содержать код статуса 201 и данные в формате json\", function () {\r",
-							"    pm.response.to.have.status(201);  \r",
-							"    pm.response.to.be.withBody;\r",
-							"    pm.response.to.be.json;\r",
-							"});\r",
-							"const source = JSON.parse(pm.request.body.raw);\r",
-							"const target = pm.response.json();\r",
-							"\r",
-							"pm.test(\"Событие должно содержать поля: id, title, annotation, category, paid, eventDate, initiator, description, participantLimit, state, createdOn, location, requestModeration\", function () {\r",
-							"pm.expect(target).to.have.property('id');\r",
-							"pm.expect(target).to.have.property('title');\r",
-							"pm.expect(target).to.have.property('annotation');\r",
-							"pm.expect(target).to.have.property('category');\r",
-							"pm.expect(target).to.have.property('paid');\r",
-							"pm.expect(target).to.have.property('eventDate');\r",
-							"pm.expect(target).to.have.property('initiator');\r",
-							"pm.expect(target).to.have.property('description');\r",
-							"pm.expect(target).to.have.property('participantLimit');\r",
-							"pm.expect(target).to.have.property('state');\r",
-							"pm.expect(target).to.have.property('createdOn');\r",
-							"pm.expect(target).to.have.property('location');\r",
-							"pm.expect(target).to.have.property('requestModeration');\r",
-							"});\r",
-							"\r",
-							"pm.test(\"Данные в ответе должны соответствовать данным в запросе\", function () {\r",
-							"    pm.expect(target.id).to.not.be.null;\r",
-							"    pm.expect(target.title).equal(source.title, 'Название события должно соответствовать названию события в запросе');\r",
-							"    pm.expect(target.annotation).equal(source.annotation, 'Аннотация события должна соответствовать аннотации события в запросе');\r",
-							"    pm.expect(target.paid.toString()).equal(source.paid.toString(), 'Стоимость события должна соответствовать стоимости события в запросе');\r",
-							"    pm.expect(target.eventDate).equal(source.eventDate, 'Дата проведения события должна соответствовать дате проведения события в запросе');\r",
-							"    pm.expect(target.description).equal(source.description, 'Описание события должно соответствовать описание события в запросе');\r",
-							"    pm.expect(target.participantLimit.toString()).equal(source.participantLimit.toString(), 'Лимит участников события должно соответствовать лимиту участников события в запросе');\r",
-							"    pm.expect(target.location.lat.toString()).equal(source.location.lat.toString(), 'Широта локации проведения события должна соответствовать широте локации проведения события в запросе');\r",
-							"    pm.expect(target.location.lon.toString()).equal(source.location.lon.toString(), 'Долгота локации проведения события должна соответствовать долготе локации проведения события в запросе');\r",
-							"    pm.expect(target.requestModeration.toString()).equal(source.requestModeration.toString(), 'Необходимость модерации события должна соответствовать необходимости модерации события в запросе');\r",
-							"});"
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"method": "POST",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "{\r\n  \"annotation\": \"Incidunt veniam dolor cumque voluptas consequatur amet eos voluptatem. Repudiandae sit quidem ipsam aut voluptas eos. Nulla et fuga dolorum odio in autem.\",\r\n  \"category\": 2,\r\n  \"description\": \"Est officia laboriosam porro provident nemo nam. Ut odio corporis quia. Et cum sed assumenda praesentium. Quaerat quisquam cumque iusto labore laboriosam nobis qui beatae.\\n \\rLaborum aliquam nobis voluptate qui. Tempore qui reiciendis laudantium. Sequi soluta officiis accusamus veritatis. Cupiditate dolorem ipsum aliquam consequuntur inventore. Qui ipsum sapiente iste.\\n \\rProvident occaecati rerum et recusandae qui sed culpa distinctio quas. Non nemo commodi optio quidem sed. Non similique sunt. Eius et aut est velit et excepturi magnam voluptatem. Iste hic iste et suscipit corporis rerum accusantium ab quia.\",\r\n  \"eventDate\": \"2025-12-31 15:10:05\",\r\n  \"location\": {\r\n    \"lat\": 33.754167,\r\n    \"lon\": 16.62\r\n  },\r\n  \"paid\": true,\r\n  \"participantLimit\": 20,\r\n  \"requestModeration\": false,\r\n  \"title\": \"New event number 2\"\r\n}",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "{{baseUrl}}/users/:userId/events",
-					"host": [
-						"{{baseUrl}}"
-					],
-					"path": [
-						"users",
-						":userId",
-						"events"
-					],
-					"variable": [
-						{
-							"key": "userId",
-							"value": "1"
-						}
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Publish event id = 2",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"pm.test(\"Status code is 200\", function () {\r",
-							"    pm.expect(pm.response.code).to.be.oneOf([200]);\r",
-							"});\r",
-							"pm.test(\"Ответ должен содержать код статуса 200 и данные в формате json\", function () {\r",
-							"    pm.response.to.be.ok;    \r",
-							"    pm.response.to.be.withBody;\r",
-							"    pm.response.to.be.json;\r",
-							"});\r",
-							"\r",
-							"const source = pm.collectionVariables.get('response');\r",
-							"const target = pm.response.json();\r",
-							"console.log(source)\r",
-							"console.log(target)\r",
-							"pm.test(\"Событие должно содержать поля: id, title, annotation, category, paid, eventDate, initiator, description, participantLimit, state, createdOn, publishedOn, location, requestModeration\", function () {\r",
-							"pm.expect(target).to.have.property('id');\r",
-							"pm.expect(target).to.have.property('title');\r",
-							"pm.expect(target).to.have.property('annotation');\r",
-							"pm.expect(target).to.have.property('category');\r",
-							"pm.expect(target).to.have.property('paid');\r",
-							"pm.expect(target).to.have.property('eventDate');\r",
-							"pm.expect(target).to.have.property('initiator');\r",
-							"pm.expect(target).to.have.property('description');\r",
-							"pm.expect(target).to.have.property('participantLimit');\r",
-							"pm.expect(target).to.have.property('state');\r",
-							"pm.expect(target).to.have.property('createdOn');\r",
-							"pm.expect(target).to.have.property('publishedOn');\r",
-							"pm.expect(target).to.have.property('location');\r",
-							"pm.expect(target).to.have.property('requestModeration');\r",
-							"});\r",
-							"\r",
-							"pm.test(\"Данные в ответе должны соответствовать данным в запросе\", function () {\r",
-							"    pm.expect(target.state).to.eql('PUBLISHED');\r",
-							"    \r",
-							"});"
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"method": "PATCH",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "{\r\n    \"stateAction\": \"PUBLISH_EVENT\"\r\n}",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "{{baseUrl}}/admin/events/:eventId",
-					"host": [
-						"{{baseUrl}}"
-					],
-					"path": [
-						"admin",
-						"events",
-						":eventId"
-					],
-					"variable": [
-						{
-							"key": "eventId",
-							"value": "2"
-						}
-					]
-				}
-			},
-			"response": []
-		},
-		{
 			"name": "User id=2 add dislike to event id=2 ",
 			"event": [
 				{
@@ -1000,7 +578,7 @@
 						},
 						{
 							"key": "eventId",
-							"value": "2"
+							"value": "3"
 						}
 					]
 				}
@@ -1008,7 +586,7 @@
 			"response": []
 		},
 		{
-			"name": "Get events added by user 1 sorted",
+			"name": "Get events added by user 3 sorted",
 			"event": [
 				{
 					"listen": "prerequest",
@@ -1082,7 +660,7 @@
 					"variable": [
 						{
 							"key": "userId",
-							"value": "1"
+							"value": "3"
 						}
 					]
 				}

@@ -30,7 +30,7 @@ public class PublicController {
 
     StatisticClient statisticClient;
 
-    DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+    static DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
     public PublicController(PublicService publicService, StatisticClient statisticClient) {
         this.publicService = publicService;

@@ -36,11 +36,11 @@ public class PublicServiceImpl implements PublicService {
 
     RequestRepository requestRepository;
 
-    String DATE = "EVENT_DATE";
+    static String DATE = "EVENT_DATE";
 
-    String UP = "RATE_ASC";
+    static String UP = "RATE_ASC";
 
-    String DOWN = "RATE_DESC";
+    static String DOWN = "RATE_DESC";
 
     public PublicServiceImpl(CategoryRepository categoryRepository, AdminService adminService,
                              CompilationRepository compilationRepository, CompEventDAO compEventDAO,

@@ -43,8 +43,8 @@ public class AdminServiceImpl implements AdminService {
 
     CompEventDAO compEventDAO;
 
-    String UP = "ASC";
-    String DOWN = "DESC";
+    static String UP = "ASC";
+    static String DOWN = "DESC";
 
 
     public AdminServiceImpl(CategoryRepository categoryRepository, UserRepository userRepository,

@@ -38,9 +38,9 @@ public class PrivateServiceImpl implements PrivateService {
     LikesRepository likesRepository;
     UserRepository userRepository;
 
-    String UP = "ASC";
+    static String UP = "ASC";
 
-    String DOWN = "DESC";
+    static String DOWN = "DESC";
 
     public PrivateServiceImpl(EventRepository eventRepository, LocationRepository locationRepository,
                               AdminService adminService, RequestRepository requestRepository,

@@ -9,8 +9,8 @@ import org.springframework.context.annotation.Bean;
 
 @Configuration
 public class WebClientConfiguration {
-    private static final String BASE_URL = "http://stats-server:9090";
-  //  private static final String BASE_URL = "http://localhost:9090";
+  //  private static final String BASE_URL = "http://stats-server:9090";
+    private static final String BASE_URL = "http://localhost:9090";
 
 
     @Bean

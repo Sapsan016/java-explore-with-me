@@ -36,6 +36,12 @@ public class PublicServiceImpl implements PublicService {
 
     RequestRepository requestRepository;
 
+    static String DATE = "EVENT_DATE";
+
+    static String UP = "RATE_ASC";
+
+    static String DOWN = "RATE_DESC";
+
     public PublicServiceImpl(CategoryRepository categoryRepository, AdminService adminService,
                              CompilationRepository compilationRepository, CompEventDAO compEventDAO,
                              EventRepository eventRepository, RequestRepository requestRepository) {
@@ -92,7 +98,7 @@ public class PublicServiceImpl implements PublicService {
                                                    LocalDateTime startRange, Boolean onlyAvailable,
                                                    String sort, Integer from, Integer size) {
         List<Event> foundEvents = eventRepository.searchEventsAfterStartRange(text.toLowerCase(), startRange);
-
+        addViews(foundEvents);
         return filterEvents(foundEvents, categories, paid, onlyAvailable, sort, from, size);
     }
 
@@ -100,7 +106,7 @@ public class PublicServiceImpl implements PublicService {
     public List<Event> searchEventsBeforeEndRange(String text, Long[] categories, Boolean paid, LocalDateTime endRange,
                                                   Boolean onlyAvailable, String sort, Integer from, Integer size) {
         List<Event> foundEvents = eventRepository.searchEventsBeforeEndRange(text.toLowerCase(), endRange);
-
+        addViews(foundEvents);
         return filterEvents(foundEvents, categories, paid, onlyAvailable, sort, from, size);
     }
 
@@ -110,15 +116,17 @@ public class PublicServiceImpl implements PublicService {
                                                         Boolean onlyAvailable, String sort, Integer from,
                                                         Integer size) {
         List<Event> foundEvents = eventRepository.searchWithStartEnd(text.toLowerCase(), startRange, endRange);
-
+        addViews(foundEvents);
         return filterEvents(foundEvents, categories, paid, onlyAvailable, sort, from, size);
     }
 
     @Override
     public Event getEventById(Long eventId) {
         log.info("Выполняется поиск события Id = {}", eventId);
-        return eventRepository.findById(eventId).orElseThrow(() ->
+        Event foundEvent = eventRepository.findById(eventId).orElseThrow(() ->
                 new ObjectNotFoundException(String.format("Подборка событий ID=%s не найдена", eventId)));
+        foundEvent.setViews(foundEvent.getViews() + 1);
+        return foundEvent;
     }
 
     private List<Event> filterEvents(List<Event> foundEvents, Long[] categories, Boolean paid, Boolean onlyAvailable,
@@ -136,10 +144,26 @@ public class PublicServiceImpl implements PublicService {
                             .countParticipationRequestsByEventAndStatus(event.getId(), RequestState.CONFIRMED))
                     .collect(Collectors.toList());
         }
-        if (sort.equals("EVENT_DATE")) {
+        if (sort.equals(DATE)) {
             return foundEvents.stream()
                     .filter(event -> event.getPaid().equals(paid))
                     .sorted(Comparator.comparing(Event::getEventDate))
+                    .skip(from)
+                    .limit(size)
+                    .collect(Collectors.toList());
+        }
+        if (sort.equals(UP)) {
+            return foundEvents.stream()
+                    .filter(event -> event.getPaid().equals(paid))
+                    .sorted(Comparator.comparing(Event::getRate))
+                    .skip(from)
+                    .limit(size)
+                    .collect(Collectors.toList());
+        }
+        if (sort.equals(DOWN)) {
+            return foundEvents.stream()
+                    .filter(event -> event.getPaid().equals(paid))
+                    .sorted(Comparator.comparing(Event::getRate).reversed())
                     .skip(from)
                     .limit(size)
                     .collect(Collectors.toList());
@@ -167,6 +191,11 @@ public class PublicServiceImpl implements PublicService {
                     .collect(Collectors.toList()));
         }
         return compilations;
+    }
+
+    private void addViews(List<Event> foundEvents) {
+        foundEvents.forEach(event -> event.setViews(event.getViews() + 1));
+        eventRepository.saveAll(foundEvents);
     }
 
 }

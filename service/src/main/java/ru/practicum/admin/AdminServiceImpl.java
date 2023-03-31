@@ -23,6 +23,7 @@ import ru.practicum.repositories.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -41,6 +42,9 @@ public class AdminServiceImpl implements AdminService {
     CompilationRepository compilationRepository;
 
     CompEventDAO compEventDAO;
+
+    static String UP = "ASC";
+    static String DOWN = "DESC";
 
 
     public AdminServiceImpl(CategoryRepository categoryRepository, UserRepository userRepository,
@@ -97,18 +101,18 @@ public class AdminServiceImpl implements AdminService {
     }
 
     @Override
-    public List<User> getUsers(Long[] ids, Integer from, Integer size) {
+    public List<User> getUsers(Long[] ids, Integer from, Integer size, String sort) {
         if (ids.length == 0) {
-            log.info("Выполняется поиск всех пользователей пропуская первых {}, размер списка {}", from, size);
-            return userRepository.getAllUsers(from, size);
+            log.info("Выполняется поиск всех пользователей пропуская первых {}, размер списка {}, " +
+                    "сортировка по рейтингу {}", from, size, sort);
+            List<User> foundUsers = userRepository.getAllUsers(from, size);
+            return sortAndReturnUsers(foundUsers, from, size, sort);
         }
         log.info("Выполняется поиск всех пользователей с ID {} пропуская первых {}, размер списка {}",
                 Arrays.toString(ids), from, size);
         try {
-            return Arrays.stream(ids).map(this::findUserById)
-                    .skip(from)
-                    .limit(size)
-                    .collect(Collectors.toList());
+            List<User> foundUsers = Arrays.stream(ids).map(this::findUserById).collect(Collectors.toList());
+            return sortAndReturnUsers(foundUsers, from, size, sort);
         } catch (ObjectNotFoundException e) {
             return new ArrayList<>();
         }
@@ -116,7 +120,7 @@ public class AdminServiceImpl implements AdminService {
 
     private void findEventsByUser(List<Event> foundEvents, Long[] users) {
         for (Long user : users) {
-            foundEvents.addAll(eventRepository.getAllEventsByUserId(user, 0, Integer.MAX_VALUE));
+            foundEvents.addAll(eventRepository.getAllEventsByUserIdAndLimit(user, 0, Integer.MAX_VALUE));
         }
     }
 
@@ -135,7 +139,7 @@ public class AdminServiceImpl implements AdminService {
 
     @Override
     public List<Event> getEventsWithTime(Long[] users, String[] states, Long[] categories, LocalDateTime rangeStart,
-                                         LocalDateTime rangeEnd, Integer from, Integer size) {
+                                         LocalDateTime rangeEnd, Integer from, Integer size, String sort) {
         List<Event> foundEvents = new ArrayList<>();
         if (users.length != 0) {
             foundEvents = findEvents(users, states, categories, foundEvents);
@@ -171,15 +175,15 @@ public class AdminServiceImpl implements AdminService {
 
     @Override
     public List<Event> getEventsWithStartTimeParamTime(Long[] users, String[] states, Long[] categories,
-                                                       LocalDateTime rangeStart, Integer from, Integer size) {
+                                                       LocalDateTime rangeStart, Integer from, Integer size,
+                                                       String sort) {
         List<Event> foundEvents = new ArrayList<>();
         if (users.length != 0) {
             foundEvents = findEvents(users, states, categories, foundEvents);
-            return foundEvents.stream()
+            foundEvents = foundEvents.stream()
                     .filter(event -> event.getEventDate().isAfter(rangeStart))
-                    .skip(from)
-                    .limit(size)
                     .collect(Collectors.toList());
+            return sortLimitAndReturnEvents(foundEvents, from, size, sort);
         }
         if (states.length != 0) {
             findEventsByState(foundEvents, states);
@@ -190,17 +194,17 @@ public class AdminServiceImpl implements AdminService {
                             .collect(Collectors.toList());
                 }
             }
-            return foundEvents.stream()
+            foundEvents = foundEvents.stream()
                     .filter(event -> event.getEventDate().isAfter(rangeStart))
-                    .skip(from)
-                    .limit(size)
                     .collect(Collectors.toList());
+            return sortLimitAndReturnEvents(foundEvents, from, size, sort);
         }
         if (categories.length != 0) {
             findEventsByCategoryAndFromSize(foundEvents, categories, from, size);
-            return foundEvents;
+            return sortAndReturnEvents(foundEvents, sort);
         }
-        return eventRepository.getEventsByStartTimeAndFromAndSize(rangeStart, from, size);
+        foundEvents = eventRepository.getEventsByStartTimeAndFromAndSize(rangeStart, from, size);
+        return sortAndReturnEvents(foundEvents, sort);
     }
 
     private List<Event> findEvents(Long[] users, String[] states, Long[] categories, List<Event> foundEvents) {
@@ -225,15 +229,14 @@ public class AdminServiceImpl implements AdminService {
 
     @Override
     public List<Event> getEventsWithEndTimeParamTime(Long[] users, String[] states, Long[] categories,
-                                                     LocalDateTime rangeEnd, Integer from, Integer size) {
+                                                     LocalDateTime rangeEnd, Integer from, Integer size, String sort) {
         List<Event> foundEvents = new ArrayList<>();
         if (users.length != 0) {
             foundEvents = findEvents(users, states, categories, foundEvents);
-            return foundEvents.stream()
+            foundEvents = foundEvents.stream()
                     .filter(event -> event.getEventDate().isBefore(rangeEnd))
-                    .skip(from)
-                    .limit(size)
                     .collect(Collectors.toList());
+            return sortLimitAndReturnEvents(foundEvents, from, size, sort);
         }
         if (states.length != 0) {
             findEventsByState(foundEvents, states);
@@ -244,30 +247,27 @@ public class AdminServiceImpl implements AdminService {
                             .collect(Collectors.toList());
                 }
             }
-            return foundEvents.stream()
+            foundEvents = foundEvents.stream()
                     .filter(event -> event.getEventDate().isBefore(rangeEnd))
-                    .skip(from)
-                    .limit(size)
                     .collect(Collectors.toList());
+            return sortLimitAndReturnEvents(foundEvents, from, size, sort);
         }
         if (categories.length != 0) {
             findEventsByCategoryAndFromSize(foundEvents, categories, from, size);
-            return foundEvents;
+            return sortAndReturnEvents(foundEvents, sort);
         }
-        return eventRepository.getEventsByEndTimeAndFromAndSize(rangeEnd, from, size);
+        foundEvents = eventRepository.getEventsByEndTimeAndFromAndSize(rangeEnd, from, size);
+        return sortAndReturnEvents(foundEvents, sort);
     }
 
 
     @Override
     public List<Event> getEventsWithoutTime(Long[] users, String[] states, Long[] categories,
-                                            Integer from, Integer size) {
+                                            Integer from, Integer size, String sort) {
         List<Event> foundEvents = new ArrayList<>();
         if (users.length != 0) {
             foundEvents = findEvents(users, states, categories, foundEvents);
-            return foundEvents.stream()
-                    .skip(from)
-                    .limit(size)
-                    .collect(Collectors.toList());
+            return sortLimitAndReturnEvents(foundEvents, from, size, sort);
         }
         if (states.length != 0) {
             findEventsByState(foundEvents, states);
@@ -278,16 +278,14 @@ public class AdminServiceImpl implements AdminService {
                             .collect(Collectors.toList());
                 }
             }
-            return foundEvents.stream()
-                    .skip(from)
-                    .limit(size)
-                    .collect(Collectors.toList());
+            return sortLimitAndReturnEvents(foundEvents, from, size, sort);
         }
         if (categories.length != 0) {
             findEventsByCategoryAndFromSize(foundEvents, categories, from, size);
-            return foundEvents;
+            return sortAndReturnEvents(foundEvents, sort);
         }
-        return eventRepository.getEventsByFromAndSize(from, size);
+        foundEvents = eventRepository.getEventsByFromAndSize(from, size);
+        return sortAndReturnEvents(foundEvents, sort);
     }
 
     @Override
@@ -410,5 +408,60 @@ public class AdminServiceImpl implements AdminService {
         return compilation;
     }
 
+    private List<User> sortAndReturnUsers(List<User> foundUsers, Integer from, Integer size, String sort) {
+        if (sort.equals(UP)) {
+            return foundUsers.stream()
+                    .sorted(Comparator.comparing(User::getUserRate))
+                    .skip(from)
+                    .limit(size)
+                    .collect(Collectors.toList());
+        }
+        if (sort.equals(DOWN)) {
+            return foundUsers.stream()
+                    .sorted(Comparator.comparing(User::getUserRate).reversed())
+                    .skip(from)
+                    .limit(size)
+                    .collect(Collectors.toList());
+        }
+        return foundUsers.stream()
+                .skip(from)
+                .limit(size)
+                .collect(Collectors.toList());
+    }
+
+    private List<Event> sortLimitAndReturnEvents(List<Event> foundEvents, Integer from, Integer size, String sort) {
+        if (sort.equals(UP)) {
+            return foundEvents.stream()
+                    .sorted(Comparator.comparing(Event::getRate))
+                    .skip(from)
+                    .limit(size)
+                    .collect(Collectors.toList());
+        }
+        if (sort.equals(DOWN)) {
+            return foundEvents.stream()
+                    .sorted(Comparator.comparing(Event::getRate).reversed())
+                    .skip(from)
+                    .limit(size)
+                    .collect(Collectors.toList());
+        }
+        return foundEvents.stream()
+                .skip(from)
+                .limit(size)
+                .collect(Collectors.toList());
+    }
+
+    private List<Event> sortAndReturnEvents(List<Event> foundEvents, String sort) {
+        if (sort.equals(UP)) {
+            return foundEvents.stream()
+                    .sorted(Comparator.comparing(Event::getRate))
+                    .collect(Collectors.toList());
+        }
+        if (sort.equals(DOWN)) {
+            return foundEvents.stream()
+                    .sorted(Comparator.comparing(Event::getRate).reversed())
+                    .collect(Collectors.toList());
+        }
+        return foundEvents;
+    }
 
 }

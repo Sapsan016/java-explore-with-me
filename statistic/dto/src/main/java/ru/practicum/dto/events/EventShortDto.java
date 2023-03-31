@@ -31,4 +31,6 @@ public class EventShortDto {
     String title;
 
     Integer views;
+
+    Integer rate;
 }

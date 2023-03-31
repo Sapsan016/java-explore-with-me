@@ -47,4 +47,6 @@ public class EventFullDto {
     String title;
 
     Integer views;
+
+    Integer rate;
 }

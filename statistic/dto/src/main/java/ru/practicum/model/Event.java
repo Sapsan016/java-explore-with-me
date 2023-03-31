@@ -64,14 +64,16 @@ public class Event {
 
     Integer views;
 
+    Integer rate;
+
 
     @Override
     public String toString() {
         return String.format("Event{ " +
                         "ID=%s, annotation='%s, category=%s, confirmedRequests=%s, createdOn=%s, description='%s," +
                         "eventDate=%s, user=%s, location=%s, paid=%s, participantLimit=%s, publishedOn=%s, " +
-                        "requestModeration=%s, state=%s, title='%s, views=%s",
+                        "requestModeration=%s, state=%s, title='%s, views=%s, views=%s",
                 id, annotation, category, confirmedRequests, createdOn, description, eventDate, user, location,
-                paid, participantLimit, publishedOn, requestModeration, state, title, views);
+                paid, participantLimit, publishedOn, requestModeration, state, title, views, rate);
     }
 }

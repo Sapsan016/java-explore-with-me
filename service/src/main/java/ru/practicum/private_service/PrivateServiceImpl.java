@@ -18,9 +18,7 @@ import ru.practicum.exception.ObjectNotFoundException;
 import ru.practicum.mappers.EventMapper;
 import ru.practicum.mappers.RequestMapper;
 import ru.practicum.model.*;
-import ru.practicum.repositories.EventRepository;
-import ru.practicum.repositories.LocationRepository;
-import ru.practicum.repositories.RequestRepository;
+import ru.practicum.repositories.*;
 
 import java.time.LocalDateTime;
 import java.util.Comparator;
@@ -36,15 +34,23 @@ public class PrivateServiceImpl implements PrivateService {
     EventRepository eventRepository;
     LocationRepository locationRepository;
     AdminService adminService;
-
     RequestRepository requestRepository;
+    LikesRepository likesRepository;
+    UserRepository userRepository;
+
+    static String UP = "ASC";
+
+    static String DOWN = "DESC";
 
     public PrivateServiceImpl(EventRepository eventRepository, LocationRepository locationRepository,
-                              AdminService adminService, RequestRepository requestRepository) {
+                              AdminService adminService, RequestRepository requestRepository,
+                              LikesRepository likesRepository, UserRepository userRepository) {
         this.eventRepository = eventRepository;
         this.locationRepository = locationRepository;
         this.adminService = adminService;
         this.requestRepository = requestRepository;
+        this.likesRepository = likesRepository;
+        this.userRepository = userRepository;
     }
 
     @Override
@@ -65,7 +71,7 @@ public class PrivateServiceImpl implements PrivateService {
     public List<Event> getEventsByUserId(Long userId, Integer from, Integer size) {
         log.info("Выполняется поиск всех событий, добавленных пользователем с ID = {} пропуская первых {}, " +
                 "размер списка {}", userId, from, size);
-        return eventRepository.getAllEventsByUserId(userId, from, size);
+        return eventRepository.getAllEventsByUserIdAndLimit(userId, from, size);
     }
 
     @Override
@@ -210,11 +216,126 @@ public class PrivateServiceImpl implements PrivateService {
         return requestRepository.findParticipationRequestsByEvent(eventId);
     }
 
+    @Override
+    public Like addLike(Long userId, Long eventId, Boolean like) {
+        Event eventToLike = findEventById(eventId);
+        if (!eventToLike.getState().equals(EventState.PUBLISHED))
+            throw new IllegalArgumentException(String.format("Событие с ID = %s не опубликовано администратором.",
+                    eventId));
+        User userLike = adminService.findUserById(userId);
+        if (likesRepository.findByEventAndUser(eventToLike, userLike) != null)
+            throw new IllegalArgumentException(String.format("Пользователь с ID = %s уже поставил лайк событию " +
+                    "c ID = %s", userId, eventId));
+
+        Like likeToAdd = new Like(null, eventToLike, userLike, like);
+        likesRepository.save(likeToAdd);
+        log.info("Добавлен лайк с ID = {}, пользователем с ID = {} событию с ID = {}", likeToAdd.getId(),
+                userId, eventId);
+        calculateAndSetEventRate(eventToLike);
+        calculateAndSetUserRate(eventToLike.getUser());
+        return likeToAdd;
+    }
+
+    @Override
+    public Like changeLike(Long userId, Long likeId, Boolean like) {
+        Like likeToChange = checkAndReturnLike(likeId, userId);
+        likeToChange.setIsLike(like);
+        likesRepository.save(likeToChange);
+        log.info("Изменен лайк с ID = {}, пользователем с ID = {}", likeId, userId);
+        Event likedEvent = findEventById(likeToChange.getEvent().getId());
+        calculateAndSetEventRate(likedEvent);
+        calculateAndSetUserRate(likedEvent.getUser());
+        return likeToChange;
+    }
+
+
+    @Override
+    public List<Event> getLikedEventsByUserId(Long userId, Integer from, Integer size, String sort) {
+        User userLiked = adminService.findUserById(userId);
+        List<Like> likes = likesRepository.findByUserAndIsLikeIsTrue(userLiked);
+        List<Long> eventIds = likes.stream().map(like -> like.getEvent().getId()).collect(Collectors.toList());
+        log.info("Выполняется поиск событий c ID: {} понравившихся пользователю с ID = {}, " +
+                "пропуская первые: {} событий, размер списка:{}", eventIds, userId, from, size);
+        if (sort.equals(UP)) {
+            return eventRepository.findAllById(eventIds).stream()
+                    .sorted(Comparator.comparing(Event::getRate))
+                    .skip(from)
+                    .limit(size)
+                    .collect(Collectors.toList());
+        }
+        if (sort.equals(DOWN)) {
+            return eventRepository.findAllById(eventIds).stream()
+                    .sorted(Comparator.comparing(Event::getRate).reversed())
+                    .skip(from)
+                    .limit(size)
+                    .collect(Collectors.toList());
+        }
+        return eventRepository.findAllById(eventIds).stream()
+                .skip(from)
+                .limit(size)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public void removeLike(Long userId, Long likeId) {
+        Like likeToRemove = checkAndReturnLike(likeId, userId);
+        likesRepository.delete(likeToRemove);
+        log.info("Удален лайк от пользователя с ID = {}, поставленный событию с ID = {}",
+                userId, likeToRemove.getEvent().getId());
+        calculateAndSetEventRate(likeToRemove.getEvent());
+        calculateAndSetUserRate(likeToRemove.getEvent().getUser());
+    }
+
+    @Override
+    public List<Event> getSortedEventsByUserId(Long userId, Integer from, Integer size, String sort) {
+        List<Event> foundEvents = eventRepository.getAllEventsByUserId(userId);
+        if (sort.equals(UP)) {
+            return foundEvents.stream()
+                    .sorted(Comparator.comparing(Event::getRate))
+                    .skip(from)
+                    .limit(size)
+                    .collect(Collectors.toList());
+        }
+        return foundEvents.stream()
+                .sorted(Comparator.comparing(Event::getRate).reversed())
+                .skip(from)
+                .limit(size)
+                .collect(Collectors.toList());
+    }
+
+    private void calculateAndSetEventRate(Event event) {
+        Integer rate = likesRepository.countByIsLikeIsTrueAndEvent(event) -
+                likesRepository.countByIsLikeIsFalseAndEvent(event);
+        event.setRate(rate);
+        eventRepository.save(event);
+        log.info("Для события с ID = {} установлен рейтинг:{}", event.getId(), rate);
+    }
+
+    private void calculateAndSetUserRate(User user) {
+        List<Event> userEvents = getEventsByUserId(user.getId(), 0, Integer.MAX_VALUE);
+        Double averageUserRate = 0.0;
+        for (Event event : userEvents) {
+            averageUserRate += event.getRate();
+        }
+
+        averageUserRate = averageUserRate / userEvents.size();
+        user.setUserRate(averageUserRate);
+        log.info("Для пользователя с ID = {} установлен рейтинг:{}", user.getId(), averageUserRate);
+        userRepository.save(user);
+    }
 
     private boolean checkRequestsCount(Event requestedEvent) {
         Integer requestCount = requestRepository.countParticipationRequestsByEventAndStatus(requestedEvent.getId(),
                 RequestState.CONFIRMED);
         return requestCount >= (requestedEvent.getParticipantLimit());
+    }
+
+    private Like checkAndReturnLike(Long likeId, Long userId) {
+        Like likeToChange = likesRepository.findById(likeId).orElseThrow(() ->
+                new ObjectNotFoundException(String.format("Событие с ID=%s не найдено", likeId)));
+        if (!likeToChange.getUser().getId().equals(userId))
+            throw new IllegalArgumentException("Пользователь не ставил лайк этому событию");
+        return likeToChange;
     }
 
     private void updateRequestsWithoutModeration(Event event, EventRequestStatusUpdateRequest updateRequest) {

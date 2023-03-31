@@ -23,14 +23,14 @@ public interface AdminService {
 
     void removeUser(Long userId);
 
-    List<User> getUsers(Long[] ids, Integer from, Integer size);
+    List<User> getUsers(Long[] ids, Integer from, Integer size, String sort);
 
     Category findCategoryById(Long catId);
 
     User findUserById(Long userId);
 
     List<Event> getEventsWithTime(Long[] users, String[] states, Long[] categories, LocalDateTime rangeStart,
-                                  LocalDateTime rangeEnd, Integer from, Integer size);
+                                  LocalDateTime rangeEnd, Integer from, Integer size, String sort);
 
     Event updateEvent(UpdateEventRequest updateEventDto, Long eventId);
 
@@ -43,11 +43,11 @@ public interface AdminService {
     Compilation alterCompilation(Long compId, NewCompilationDto newCompDto);
 
 
-    List<Event> getEventsWithoutTime(Long[] users, String[] states, Long[] categories, Integer from, Integer size);
+    List<Event> getEventsWithoutTime(Long[] users, String[] states, Long[] categories, Integer from, Integer size, String sort);
 
     List<Event> getEventsWithStartTimeParamTime(Long[] users, String[] states, Long[] categories,
-                                                LocalDateTime rangeStart, Integer from, Integer size);
+                                                LocalDateTime rangeStart, Integer from, Integer size, String sort);
 
     List<Event> getEventsWithEndTimeParamTime(Long[] users, String[] states, Long[] categories, LocalDateTime rangeEnd,
-                                              Integer from, Integer size);
+                                              Integer from, Integer size, String sort);
 }

@@ -16,4 +16,8 @@ public interface StatRepository extends JpaRepository<EndpointHit, Long> {
     @Query(value = "SELECT DISTINCT ON (ip) hit_id, app, uri, ip, timestamp FROM hits WHERE uri=? " +
             "AND (timestamp between ? and ?)", nativeQuery = true)
     List<EndpointHit> findUniqueUriStats(String uri, LocalDateTime start, LocalDateTime end);
+
+    List<EndpointHit> findAllByTimestampBetween(LocalDateTime start, LocalDateTime end);
+
+
 }

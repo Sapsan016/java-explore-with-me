@@ -12,6 +12,7 @@ import javax.validation.Valid;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -39,21 +40,35 @@ public class StatController {
     @GetMapping(path = "/stats")                                                  //Получение статистики за период
     public List<HitDto> getStats(@RequestParam String start,
                                  @RequestParam String end,
-                                 @RequestParam(required = false) String[] uris,
+                                 @RequestParam(required = false, defaultValue = "") String[] uris,
                                  @RequestParam(defaultValue = "false") boolean unique) {
+        log.info("StatController: получен запрос на поиск статистики за период с: {} по: {}, для uri: {}, " +
+                "выбирая только уникальные uri: {}", start, end, Arrays.toString(uris), unique);
         List<HitDto> list = new ArrayList<>();
-        if (unique) {                                                        //Получение статистики для уникального ip
+        if (unique) {                                                        //Получение статистики для уникального uri
             for (String uri : uris) {
                 list.add(statService.getUniqueIpStats(LocalDateTime.parse(start, FORMATTER),
                         LocalDateTime.parse(end, FORMATTER), uri));
             }
-        } else {
+            return list
+                    .stream()
+                    .sorted(Comparator.comparingInt(HitDto::getHits).reversed())
+                    .collect(Collectors.toList());
+
+        } else if (uris.length > 0) {
             for (String uri : uris) {
                 list.add(statService.getUriStats(LocalDateTime.parse(start, FORMATTER),
                         LocalDateTime.parse(end, FORMATTER), uri));
             }
+            return list
+                    .stream()
+                    .sorted(Comparator.comparingInt(HitDto::getHits).reversed())
+                    .collect(Collectors.toList());
         }
-        return list.stream()
+        list.addAll(statService.getAllStats(LocalDateTime.parse(start, FORMATTER),
+                LocalDateTime.parse(end, FORMATTER)));
+        return list
+                .stream()
                 .sorted(Comparator.comparingInt(HitDto::getHits).reversed())
                 .collect(Collectors.toList());
     }
